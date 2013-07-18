@@ -34,7 +34,7 @@ A built box with CLI tools, Puppet and Chef is over 5GB in size. It might be adv
 
 ## Automated GUI logins
 
-For certain automated tasks (tests requiring a GUI, for example), it's probably necessary to have an active GUI login session. Some extra effort needs to be done to have a user automatically logged in to the GUI, but[CreateUserPkg](http://magervalp.github.com/CreateUserPkg), which was used to help create the box's vagrant user, supports an auto-login option that can be used to do this, so it is possible.
+For certain automated tasks (tests requiring a GUI, for example), it's probably necessary to have an active GUI login session. Some extra effort needs to be done to have a user automatically logged in to the GUI, but [CreateUserPkg](http://magervalp.github.com/CreateUserPkg), which was used to help create the box's vagrant user, supports an auto-login option that can be used to do this, so it is possible.
 
 ## Alternate approaches to VM provisioning
 Mads Fog Albrechtslund documents a [method](http://hazenet.dk/2013/07/17/creating-a-never-booted-os-x-template-in-vsphere-5-1) for converting unbooted .dmg images into VMDK files for use with ESXi.
