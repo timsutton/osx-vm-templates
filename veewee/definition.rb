@@ -20,7 +20,8 @@ Veewee::Definition.declare({
   :sudo_cmd => "echo '%p'|sudo -S sh '%f'",
   :shutdown_cmd => "shutdown -h now",
   :postinstall_files => [
-    "postinstall.sh",           # Base configuration (vagrant user, keys, guest OS tools, etc.)
+    "vagrant.sh",             # Vagrant config (vagrant user, keys)
+    "vmware.sh",              # VMware config
     "xcode-cli-tools.sh",     # Xcode CLI tools
     "chef-omnibus.sh",        # Chef Omnibus install
     "puppet.sh",               # Puppet install from Hashicorp's puppet-boostrap repo
