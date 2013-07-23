@@ -36,7 +36,8 @@
     {
       "execute_command": "chmod +x {{ .Path }}; sudo {{ .Vars }} {{ .Path }}",
       "scripts": [
-        "../scripts/postinstall.sh",
+        "../scripts/vagrant.sh",
+        "../scripts/vmware.sh",
         "../scripts/xcode-cli-tools.sh",
         "../scripts/chef-omnibus.sh",
         "../scripts/puppet.sh"
