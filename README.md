@@ -18,7 +18,7 @@ The path and checksum can now be added to your Packer or VeeWee template/definit
 
 OS X's installer supports a kind of bootstrap install functionality similar to Linux and Windows, however it must be invoked using pre-existing files placed on the booted installation media. This approach is roughly equivalent to that used by Apple's System Image Utility for deploying automated OS X installations and image restoration.
 
-The prepare_iso.sh script in this repo takes care of mounting and modifying a vanilla OS X installer downloaded from the Mac App Store. The resulting .dmg file and checksum can then be added to the Packer template or VeeWee definition. Because the preparation is done up front, no boot command sequences are required.
+The `prepare_iso.sh` script in this repo takes care of mounting and modifying a vanilla OS X installer downloaded from the Mac App Store. The resulting .dmg file and checksum can then be added to the Packer template or VeeWee definition. Because the preparation is done up front, no boot command sequences are required.
 
 More details as to the modifications to the installer media are provided in the comments of the script.
 
