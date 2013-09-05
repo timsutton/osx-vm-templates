@@ -10,9 +10,16 @@ Run the prepare_iso.sh script with two arguments: the path to an "Install OS X.a
 
 `sudo prepare_iso/prepare_iso.sh "/Applications/Install OS X Mountain Lion.app" out`
 
-...should produce a DMG at `out/OSX_InstallESD_10.8.4_12E55.dmg`, and an MD5 checksum is printed at the end of the process.
+...should output progress information ending in something this:
 
-The path and checksum can now be added to your Packer or VeeWee template/definition file. The `packer` and `veewee` folders contain templates that can be used with the `vmware` builder and `vmfusion` providers, for the respective build systems. The Packer template adds some additional VMX options required for OS X guests, but VeeWee has this functionality built-in.
+```
+-- MD5: dc93ded64396574897a5f41d6dd7066c
+-- Done. Built image is located at out/OSX_InstallESD_10.8.4_12E55.dmg. Add this iso and its checksum to your template.
+```
+
+The path and checksum can now be added to your Packer or VeeWee template/definition file. The `packer` and `veewee` folders contain templates that can be used with the `vmware` builder and `vmfusion` providers, for the respective build systems.
+
+The Packer template adds some additional VMX options required for OS X guests, but VeeWee has this functionality built-in. Also note that Packer's `iso_url` builder key accepts file paths, both absolute and relative (to the current working directory).
 
 ## Automated installs on OS X
 
