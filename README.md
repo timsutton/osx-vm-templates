@@ -4,6 +4,14 @@ This is a set of templates and scripts that will prepare an OS X installer media
 
 This also configures the machine such that it can be used out of the box with [Vagrant](http://www.vagrantup.com) and the [Hashicorp VMware Fusion provider](http://www.vagrantup.com/vmware). This requires at least Vagrant 1.3.0 and vagrant-vmware-fusion 0.8.2.
 
+Provisioning steps that are defined in the template via items in the [scripts](https://github.com/timsutton/osx-vm-templates/tree/master/scripts) directory:
+- [Vagrant-specific configuration](http://docs-v1.vagrantup.com/v1/docs/base_boxes.html)
+- VM guest tools installation
+- Xcode CLI tools installation
+- Chef installation via the [Opscode Omnibus installer](http://www.opscode.com/chef/install)
+- Puppet installation via [Hashicorp's Puppet bootstrap](https://github.com/hashicorp/puppet-bootstrap)
+
+
 ## Usage
 
 Run the prepare_iso.sh script with two arguments: the path to an "Install OS X.app" or the InstallESD.dmg contained within, and an output directory. Root privileges are required in order to write a new DMG with the correct file ownerships. For example, with a 10.8.4 Mountain Lion installer:
@@ -31,7 +39,7 @@ More details as to the modifications to the installer media are provided in the 
 
 ## Supported guest OS versions
 
-Currently the prepare script supports Lion and Mountain Lion. Support for Mavericks should be trivial to add, but will not be added prior to its public release due to NDA restrictions.
+Currently the prepare script supports Lion and Mountain Lion. Support for Mavericks will be added when it is publicly available.
 
 ## VirtualBox support
 
