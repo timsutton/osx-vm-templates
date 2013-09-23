@@ -34,6 +34,11 @@
   ],
   "provisioners": [
     {
+      "destination": "/private/tmp/kcpassword",
+      "source": "../scripts/support/kcpassword",
+      "type": "file"
+    },
+    {
       "execute_command": "chmod +x {{ .Path }}; sudo {{ .Vars }} {{ .Path }}",
       "scripts": [
         "../scripts/vagrant.sh",
@@ -43,6 +48,19 @@
         "../scripts/puppet.sh"
       ],
       "type": "shell"
+    },
+    {
+      "execute_command": "chmod +x {{ .Path }}; sudo {{ .Vars }} {{ .Path }}",
+      "inline": [
+        "[ -z \"{{user `autologin_vagrant_user`}}\" ] && exit",
+        "echo \"Enabling automatic GUI login for the 'vagrant' user..\"",
+        "cp /private/tmp/kcpassword /private/etc/kcpassword",
+        "/usr/bin/defaults write /Library/Preferences/com.apple.loginwindow autoLoginUser vagrant"
+      ],
+      "type": "shell"
     }
-  ]
+  ],
+  "variables": {
+    "autologin_vagrant_user": ""
+  }
 }
