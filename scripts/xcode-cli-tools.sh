@@ -7,7 +7,7 @@ TOOLS=clitools.dmg
 if [ "$OSX_VERS" -eq 7 ]; then
 	DMGURL=http://devimages.apple.com/downloads/xcode/command_line_tools_for_xcode_os_x_lion_april_2013.dmg
 elif [ "$OSX_VERS" -eq 8 ]; then
-	DMGURL=http://devimages.apple.com/downloads/xcode/command_line_tools_for_xcode_os_x_mountain_lion_april_2013.dmg
+	DMGURL=http://devimages.apple.com/downloads/xcode/command_line_tools_os_x_mountain_lion_for_xcode__september_2013.dmg
 fi
 curl "$DMGURL" -o "$TOOLS"
 TMPMOUNT=`/usr/bin/mktemp -d /tmp/clitools.XXXX`
