@@ -41,7 +41,7 @@ $(basename "$0") "/path/to/InstallESD.dmg" /path/to/output/directory
 $(basename "$0") "/path/to/Install OS X [Mountain] Lion.app" /path/to/output/directory
 
 Description:
-Converts a 10.7/10.8 installer image to a new image that contains components
+Converts a 10.7/10.8/10.9 installer image to a new image that contains components
 used to perform an automated installation. The new image will be named
 'OSX_InstallESD_[osversion].dmg.'
 
@@ -125,9 +125,30 @@ if [ $? -ne 0 ]; then
 	msg_error "Could not mount $ESD on $MNT_ESD"
 	exit 1
 fi
-DMG_OS_VERS=$(/usr/libexec/PlistBuddy -c 'Print :ProductVersion' "$MNT_ESD/System/Library/CoreServices/SystemVersion.plist")
+
+# Check if we might be 10.9
+if [ ! -d "$MNT_ESD/System" ] && [ -d "$MNT_ESD/Packages" ]; then
+	msg_status "This looks like a 10.9 installer. Mounting BaseSystem.."
+
+	BASE_SYSTEM_DMG="$MNT_ESD/BaseSystem.dmg"
+	MNT_BASE_SYSTEM=$(/usr/bin/mktemp -d /tmp/veewee-osx-basesystem.XXXX)
+	[ ! -e "$BASE_SYSTEM_DMG" ] && msg_error "Could not find BaseSystem.dmg in $MNT_ESD"
+	hdiutil attach "$BASE_SYSTEM_DMG" -mountpoint "$MNT_BASE_SYSTEM" -nobrowse -owners on
+	if [ $? -ne 0 ]; then
+		msg_error "Could not mount $BASE_SYSTEM_DMG on $MNT_BASE_SYSTEM"
+		exit 1
+	fi
+	SYSVER_PLIST_PATH="$MNT_BASE_SYSTEM/System/Library/CoreServices/SystemVersion.plist"
+else
+	SYSVER_PLIST_PATH="$MNT_ESD/System/Library/CoreServices/SystemVersion.plist"
+fi
+
+DMG_OS_VERS=$(/usr/libexec/PlistBuddy -c 'Print :ProductVersion' "$SYSVER_PLIST_PATH")
 DMG_OS_VERS_MAJOR=$(echo $DMG_OS_VERS | awk -F "." '{print $2}')
-DMG_OS_BUILD=$(/usr/libexec/PlistBuddy -c 'Print :ProductBuildVersion' "$MNT_ESD/System/Library/CoreServices/SystemVersion.plist")
+DMG_OS_VERS_MINOR=$(echo $DMG_OS_VERS | awk -F "." '{print $3}')
+DMG_OS_BUILD=$(/usr/libexec/PlistBuddy -c 'Print :ProductBuildVersion' "$SYSVER_PLIST_PATH")
+msg_status "OS X version detected: 10.$DMG_OS_VERS_MAJOR.$DMG_OS_VERS_MINOR, build $DMG_OS_BUILD"
+
 OUTPUT_DMG="$OUT_DIR/OSX_InstallESD_${DMG_OS_VERS}_${DMG_OS_BUILD}.dmg"
 if [ -e "$OUTPUT_DMG" ]; then
 	msg_error "Output file $OUTPUT_DMG already exists! We're not going to overwrite it, exiting.."
@@ -141,17 +162,23 @@ SUPPORT_DIR="$SCRIPT_DIR/support"
 # 10.7 systems need to get Server Admin Tools here:
 # http://support.apple.com/kb/DL1596
 # direct link: http://support.apple.com/downloads/DL1596/en_US/ServerAdminTools.dmg
-AUTOPART_APP_IN_SIU="System Image Utility.app/Contents/Library/Automator/Create Image.action/Contents/Resources/AutoPartition.app"
 OSX_VERS=$(sw_vers -productVersion | awk -F "." '{print $2}')
-if [ $DMG_OS_VERS_MAJOR -eq 8 ]; then
+# AutoPartition.app lives in different places depending on 10.8/10.9
+if [ $OSX_VERS -eq 8 ]; then
+	AUTOPART_APP_IN_SIU="System Image Utility.app/Contents/Library/Automator/Create Image.action/Contents/Resources/AutoPartition.app"
+elif [ $OSX_VERS -eq 9 ]; then
+	AUTOPART_APP_IN_SIU="System Image Utility.app/Contents/Frameworks/SIUFoundation.framework/Versions/A/XPCServices/com.apple.SIUAgent.xpc/Contents/Resources/AutoPartition.app"
+fi
+
+if [ $DMG_OS_VERS_MAJOR -ge 8 ]; then
 	if [ $OSX_VERS -eq 7 ]; then
-		msg_status "To build Mountain Lion on Lion, we need to extract AutoPartition.app from within the 10.8 installer ESD."
+		msg_status "To build OS X 10.$DMG_OS_VERS_MAJOR on Lion, we need to extract AutoPartition.app from the installer ESD."
 		SIU_TMPDIR=$(/usr/bin/mktemp -d /tmp/siu-108.XXXX)
 		msg_status "Expanding flat package.."
 		pkgutil --verbose --expand "$MNT_ESD/Packages/Essentials.pkg" "$SIU_TMPDIR/expanded"
 
 		msg_status "Generating BOM.."
-		mkbom -s -i "$SUPPORT_DIR/10_8_AP_bomlist" "$SUPPORT_DIR/BOM"
+		mkbom -s -i "$SUPPORT_DIR/10_${DMG_OS_VERS_MAJOR}_AP_bomlist" "$SUPPORT_DIR/BOM"
 
 		msg_status "Extracting AutoPartition.app using ditto.."
 		ditto --bom "$SUPPORT_DIR/BOM" -x "$SIU_TMPDIR/expanded/Payload" "$SIU_TMPDIR/ditto"
@@ -167,14 +194,15 @@ if [ $DMG_OS_VERS_MAJOR -eq 8 ]; then
 
 		AUTOPART_TOOL="$SUPPORT_DIR/AutoPartition-10.${DMG_OS_VERS_MAJOR}/AutoPartition.app"
 
-	elif [ $OSX_VERS -eq 8 ]; then
+	elif [ $OSX_VERS -ge 8 ]; then
 		AUTOPART_TOOL="/System/Library/CoreServices/$AUTOPART_APP_IN_SIU"
 		if [ ! -e "$AUTOPART_TOOL" ]; then
-			msg_error "We're on Mountain Lion, and should have System Image Utility available at $AUTOPART_TOOL, but it's not available for some reason."
+			msg_error "We're on 10.${OSX_VERS}, and should have System Image Utility available at $AUTOPART_TOOL, but it's not available for some reason."
 			exit 1
 		fi
 		cp -R "$AUTOPART_TOOL" "$SUPPORT_DIR/AutoPartition-10.${DMG_OS_VERS_MAJOR}/"
 	fi
+
 # on Lion, we first check if Server Admin Tools are already installed..
 elif [ $DMG_OS_VERS_MAJOR -eq 7 ]; then
 	msg_status "Building OS X 10.${DMG_OS_VERS_MAJOR}, so trying to locate System Image Utility from Server Admin Tools.."
@@ -215,7 +243,7 @@ elif [ $DMG_OS_VERS_MAJOR -eq 7 ]; then
 		fi
 	fi
 elif [ $DMG_OS_VERS_MAJOR -lt 7 ]; then
-	msg_error "VeeWee currently doesn't support building guest OS X versions prior to 10.7."
+	msg_error "This script currently doesn't support building guest OS X versions prior to 10.7."
 	exit 1
 fi
 
@@ -248,22 +276,67 @@ pkgbuild --quiet \
 	"$BUILT_PKG"
 rm -rf "$SUPPORT_DIR/pkgroot"
 
+if [ $DMG_OS_VERS_MAJOR -eq 9 ]; then
+	# We'd previously mounted this to check versions
+	hdiutil detach "$MNT_BASE_SYSTEM"
+
+	BASE_SYSTEM_DMG_RW="$(/usr/bin/mktemp /tmp/veewee-osx-basesystem-rw.XXXX).dmg"
+	rm "$BASE_SYSTEM_DMG_RW"
+
+	msg_status "Converting BaseSystem.dmg to a read-write DMG located at $BASE_SYSTEM_DMG_RW.."
+	# hdiutil convert -o will actually append .dmg to the filename if it has no extn
+	hdiutil convert -format UDRW -o "$BASE_SYSTEM_DMG_RW" "$BASE_SYSTEM_DMG"
+
+#	BASE_SYSTEM_SHADOW=$(/usr/bin/mktemp /tmp/veewee-osx-basesystem-shadow.XXXX)
+
+	msg_status "Growing new BaseSystem.."
+	hdiutil resize -size 6G "$BASE_SYSTEM_DMG_RW"
+	msg_status "Mounting new BaseSystem.."
+	hdiutil attach "$BASE_SYSTEM_DMG_RW" -mountpoint "$MNT_BASE_SYSTEM" -nobrowse -owners on
+
+	# Remove the symlink on the ESD that would reference the BaseSystem outside
+	rm "$MNT_BASE_SYSTEM/System/Installation/Packages"
+# 	msg_status "Copying Packages directory from the ESD to BaseSystem.."
+# 	cp -Rv "$MNT_ESD/Packages" "$MNT_BASE_SYSTEM/System/Installation/"
+	msg_status "Moving 'Packages' directory from the ESD to BaseSystem.."
+	mv -v "$MNT_ESD/Packages" "$MNT_BASE_SYSTEM/System/Installation/"
+
+	PACKAGES_DIR="$MNT_BASE_SYSTEM/System/Installation/Packages"
+else
+	PACKAGES_DIR="$MNT_ESD/Packages"
+fi
+
 # Add our auto-setup files: minstallconfig.xml, OSInstall.collection and PartitionInfo.plist
 msg_status "Adding automated components.."
-mkdir "$MNT_ESD/Packages/Extras"
-cp "$SUPPORT_DIR/minstallconfig.xml" "$MNT_ESD/Packages/Extras/"
-cp "$SUPPORT_DIR/OSInstall.collection" "$MNT_ESD/Packages/"
-cp "$SUPPORT_DIR/PartitionInfo.plist" "$MNT_ESD/Packages/Extras/"
-cp -R "$AUTOPART_TOOL" "$MNT_ESD/Packages/Extras/AutoPartition.app"
-cp "$BUILT_PKG" "$MNT_ESD/Packages/"
+mkdir "$PACKAGES_DIR/Extras"
+cp "$SUPPORT_DIR/minstallconfig.xml" "$PACKAGES_DIR/Extras/"
+cp "$SUPPORT_DIR/OSInstall.collection" "$PACKAGES_DIR/"
+cp "$SUPPORT_DIR/PartitionInfo.plist" "$PACKAGES_DIR/Extras/"
+cp -R "$AUTOPART_TOOL" "$PACKAGES_DIR/Extras/AutoPartition.app"
+cp "$BUILT_PKG" "$PACKAGES_DIR/"
 rm -rf "$SUPPORT_DIR/tmp"
+
+
+if [ $DMG_OS_VERS_MAJOR -eq 9 ]; then
+	msg_status "Detaching BaseSystem.."
+	hdiutil detach "$MNT_BASE_SYSTEM"
+# 	msg_status "Removing original BaseSystem.dmg.."
+# 	rm "$MNT_ESD/BaseSystem.dmg"
+fi
 
 msg_status "Unmounting.."
 hdiutil detach "$MNT_ESD"
 
 msg_status "Converting to final output file.."
-hdiutil convert -format UDZO -o "$OUTPUT_DMG" -shadow "$SHADOW_FILE" "$ESD"
-rm "$SHADOW_FILE"
+if [ $DMG_OS_VERS_MAJOR -lt 9 ]; then
+	hdiutil convert -format UDZO -o "$OUTPUT_DMG" -shadow "$SHADOW_FILE" "$ESD"
+	rm "$SHADOW_FILE"
+else
+	msg_status "Converting BaseSystem back to read-only compressed.."
+	hdiutil convert -format UDZO -o "$OUTPUT_DMG" "$BASE_SYSTEM_DMG_RW"
+
+fi
+
 rm -rf "$MNT_ESD"
 
 if [ -n "$SUDO_UID" ] && [ -n "$SUDO_GID" ]; then

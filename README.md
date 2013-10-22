@@ -41,7 +41,7 @@ More details as to the modifications to the installer media are provided in the 
 
 ## Supported guest OS versions
 
-Currently the prepare script supports Lion and Mountain Lion. Support for Mavericks will be added when it is publicly available.
+Currently the prepare script supports Lion, Mountain Lion, and Mavericks.
 
 
 ## Automated GUI logins
