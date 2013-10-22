@@ -41,7 +41,7 @@ $(basename "$0") "/path/to/InstallESD.dmg" /path/to/output/directory
 $(basename "$0") "/path/to/Install OS X [Mountain] Lion.app" /path/to/output/directory
 
 Description:
-Converts a 10.7/10.8 installer image to a new image that contains components
+Converts a 10.7/10.8/10.9 installer image to a new image that contains components
 used to perform an automated installation. The new image will be named
 'OSX_InstallESD_[osversion].dmg.'
 
