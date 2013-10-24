@@ -18,7 +18,7 @@ mkdir -p "$3/Users/vagrant/Library/Preferences"
 
 # Suppress annoying iCloud welcome on a GUI login
 /usr/libexec/PlistBuddy -c 'Add :DidSeeCloudSetup bool true' "$3/Users/vagrant/Library/Preferences/com.apple.SetupAssistant.plist"
-/usr/libexec/PlistBuddy -c 'Add :LastSeenCloudProductVersion string 10.8.2' "$3/Users/vagrant/Library/Preferences/com.apple.SetupAssistant.plist"
+/usr/libexec/PlistBuddy -c 'Add :LastSeenCloudProductVersion string 10.9' "$3/Users/vagrant/Library/Preferences/com.apple.SetupAssistant.plist"
 
 # Disable loginwindow screensaver to save CPU cycles
 /usr/libexec/PlistBuddy -c 'Add :loginWindowIdleTime integer 0' "$3/Library/Preferences/com.apple.screensaver.plist"
