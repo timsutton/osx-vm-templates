@@ -14,7 +14,7 @@
       "ssh_username": "vagrant",
       "ssh_wait_timeout": "10000s",
       "tools_upload_flavor": "darwin",
-      "type": "vmware",
+      "type": "vmware-iso",
       "vmx_data": {
         "cpuid.coresPerSocket": "1",
         "memsize": "2048",
