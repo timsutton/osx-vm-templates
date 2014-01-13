@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # VMware Fusion specific items
-if [ -e .vmfusion_version ] || [ "$PACKER_BUILDER_TYPE" = "vmware" ]; then
+if [ -e .vmfusion_version ] || [[ "$PACKER_BUILDER_TYPE" == vmware* ]]; then
     TMPMOUNT=`/usr/bin/mktemp -d /tmp/vmware-tools.XXXX`
     hdiutil attach darwin.iso -mountpoint "$TMPMOUNT"
     installer -pkg "$TMPMOUNT/Install VMware Tools.app/Contents/Resources/VMware Tools.pkg" -target /
