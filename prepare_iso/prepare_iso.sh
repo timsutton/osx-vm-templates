@@ -164,7 +164,7 @@ SUPPORT_DIR="$SCRIPT_DIR/support"
 # direct link: http://support.apple.com/downloads/DL1596/en_US/ServerAdminTools.dmg
 OSX_VERS=$(sw_vers -productVersion | awk -F "." '{print $2}')
 # AutoPartition.app lives in different places depending on 10.8/10.9
-if [ $OSX_VERS -eq 8 ]; then
+if [ $OSX_VERS -le 8 ]; then
 	AUTOPART_APP_IN_SIU="System Image Utility.app/Contents/Library/Automator/Create Image.action/Contents/Resources/AutoPartition.app"
 elif [ $OSX_VERS -eq 9 ]; then
 	AUTOPART_APP_IN_SIU="System Image Utility.app/Contents/Frameworks/SIUFoundation.framework/Versions/A/XPCServices/com.apple.SIUAgent.xpc/Contents/Resources/AutoPartition.app"
