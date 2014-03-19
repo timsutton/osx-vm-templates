@@ -5,11 +5,11 @@ This is a set of templates and scripts that will prepare an OS X installer media
 This also configures the machine such that it can be used out of the box with [Vagrant](http://www.vagrantup.com) and the [Hashicorp VMware Fusion provider](http://www.vagrantup.com/vmware). This requires at least Vagrant 1.3.0 and vagrant-vmware-fusion 0.8.2.
 
 Provisioning steps that are defined in the template via items in the [scripts](https://github.com/timsutton/osx-vm-templates/tree/master/scripts) directory:
-- [Vagrant-specific configuration](http://docs-v1.vagrantup.com/v1/docs/base_boxes.html)
+- [Vagrant-specific configuration](http://docs.vagrantup.com/v2/boxes/base.html)
 - VM guest tools installation
 - Xcode CLI tools installation
 - Chef installation via the [Opscode Omnibus installer](http://www.opscode.com/chef/install)
-- Puppet installation via [Hashicorp's Puppet bootstrap](https://github.com/hashicorp/puppet-bootstrap)
+- Puppet installation via [AutoPkg](https://github.com/autopkg/autopkg) [recipes](https://github.com/autopkg/recipes/tree/master/Puppetlabs)
 
 
 ## Usage
