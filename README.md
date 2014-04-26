@@ -14,7 +14,7 @@ Provisioning steps that are defined in the template via items in the [scripts](h
 
 ## Usage
 
-Run the prepare_iso.sh script with two arguments: the path to an "Install OS X.app" or the InstallESD.dmg contained within, and an output directory. Root privileges are required in order to write a new DMG with the correct file ownerships. For example, with a 10.8.4 Mountain Lion installer:
+Run the `prepare_iso.sh` script with two arguments: the path to an `Install OS X.app` or the `InstallESD.dmg` contained within, and an output directory. Root privileges are required in order to write a new DMG with the correct file ownerships. For example, with a 10.8.4 Mountain Lion installer:
 
 `sudo prepare_iso/prepare_iso.sh "/Applications/Install OS X Mountain Lion.app" out`
 
