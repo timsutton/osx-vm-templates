@@ -10,6 +10,6 @@ scutil --set HostName ${COMPNAME}.vagrantup.com
 # Installing vagrant keys
 mkdir /Users/vagrant/.ssh
 chmod 700 /Users/vagrant/.ssh
-curl -k 'https://raw.github.com/mitchellh/vagrant/master/keys/vagrant.pub' > /Users/vagrant/.ssh/authorized_keys
+curl -k 'https://raw.githubusercontent.com/mitchellh/vagrant/master/keys/vagrant.pub' > /Users/vagrant/.ssh/authorized_keys
 chmod 600 /Users/vagrant/.ssh/authorized_keys
 chown -R vagrant /Users/vagrant/.ssh
