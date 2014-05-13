@@ -3,11 +3,12 @@
 # Install the latest Puppet and Facter using AutoPkg recipes
 # https://github.com/autopkg/autopkg
 #
-# PUPPET_VERSION and FACTER_VERSION can be overridden with specific versions,
+# PUPPET_VERSION, FACTER_VERSION and HIERA_VERSION can be overridden with specific versions,
 # or "latest" to get the latest stable versions
 
 PUPPET_VERSION=${PUPPET_VERSION:-latest}
 FACTER_VERSION=${FACTER_VERSION:-latest}
+HIERA_VERSION=${HIERA_VERSION:-latest}
 
 # install function mostly borrowed dmg function from hashicorp/puppet-bootstrap,
 # except we just take an already-downloaded dmg
@@ -51,13 +52,15 @@ AUTOPKG="$AUTOPKG_DIR/Code/autopkg"
 # Retrieve the installer DMGs
 PUPPET_DMG=$(get_dmg Puppet.download "${PUPPET_VERSION}")
 FACTER_DMG=$(get_dmg Facter.download "${FACTER_VERSION}")
+HIERA_DMG=$(get_dmg Hiera.download "${HIERA_VERSION}")
 
 # Install them
 install_dmg "Puppet" "${PUPPET_DMG}"
 install_dmg "Facter" "${FACTER_DMG}"
+install_dmg "Hiera" "${HIERA_DMG}"
 
 # Hide all users from the loginwindow with uid below 500, which will include the puppet user
 defaults write /Library/Preferences/com.apple.loginwindow Hide500Users -bool YES
 
 # Clean up
-rm -rf "${PUPPET_DMG}" "${FACTER_DMG}" "~/Library/AutoPkg"
+rm -rf "${PUPPET_DMG}" "${FACTER_DMG}" "${HIERA_DMG}" "~/Library/AutoPkg"
