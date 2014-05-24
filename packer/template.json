@@ -5,8 +5,8 @@
       "disk_size": 20480,
       "guest_os_type": "darwin12-64",
       "iso_checksum_type": "md5",
-      "iso_checksum": "checksum_from_iso",
-      "iso_url": "file:///path/to/InstallESD_from_prepare_iso.dmg",
+      "iso_checksum": "{{user `iso_checksum`}}",
+      "iso_url": "{{user `iso_url`}}",
       "shutdown_command": "echo 'vagrant'|sudo -S shutdown -h now",
       "skip_compaction": true,
       "ssh_password": "vagrant",
@@ -27,6 +27,36 @@
         "ehci.present": "TRUE",
         "usb.present": "TRUE"
       }
+    },
+    {
+      "boot_wait": "2s",
+      "disk_size": 20480,
+      "guest_additions_mode": "disable",
+      "guest_os_type": "MacOS109_64",
+      "hard_drive_interface": "sata",
+      "iso_checksum_type": "md5",
+      "iso_checksum": "{{user `iso_checksum`}}",
+      "iso_interface": "sata",
+      "iso_url": "{{user `iso_url`}}",
+      "shutdown_command": "echo 'vagrant'|sudo -S shutdown -h now",
+      "ssh_password": "vagrant",
+      "ssh_port": 22,
+      "ssh_username": "vagrant",
+      "ssh_wait_timeout": "10000s",
+      "type": "virtualbox-iso",
+      "vboxmanage": [
+        ["modifyvm", "{{.Name}}", "--audiocontroller", "hda"],
+        ["modifyvm", "{{.Name}}", "--boot1", "dvd"],
+        ["modifyvm", "{{.Name}}", "--boot2", "disk"],
+        ["modifyvm", "{{.Name}}", "--chipset", "ich9"],
+        ["modifyvm", "{{.Name}}", "--cpuidset", "00000001", "000306a9", "00020800", "80000201", "178bfbff"],
+        ["modifyvm", "{{.Name}}", "--firmware", "efi"],
+        ["modifyvm", "{{.Name}}", "--hpet", "on"],
+        ["modifyvm", "{{.Name}}", "--keyboard", "usb"],
+        ["modifyvm", "{{.Name}}", "--memory", "2048"],
+        ["modifyvm", "{{.Name}}", "--mouse", "usbtablet"],
+        ["modifyvm", "{{.Name}}", "--vram", "9"]
+      ]
     }
   ],
   "post-processors": [
@@ -61,6 +91,8 @@
     }
   ],
   "variables": {
-    "autologin_vagrant_user": ""
+    "autologin_vagrant_user": "",
+    "iso_checksum": "aff67f81dfbad7afda56c423473d61a6",
+    "iso_url": "OSX_InstallESD_10.9.3_13D65.dmg"
   }
 }
