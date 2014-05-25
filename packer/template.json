@@ -60,7 +60,10 @@
     }
   ],
   "post-processors": [
-    "vagrant"
+    {
+      "type": "vagrant",
+      "vagrantfile_template": "../vagrant/Vagrantfile"
+    }
   ],
   "provisioners": [
     {

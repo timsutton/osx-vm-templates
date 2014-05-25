@@ -1,0 +1,9 @@
+# VirtualBox has no guest additions, so default to rsync shared
+# folder support
+
+Vagrant.configure("2") do |config|
+  config.vm.provider "virtualbox" do |vb|
+    config.vm.synced_folder ".", "/vagrant", type: "rsync"
+  end
+end
+
