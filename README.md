@@ -37,7 +37,10 @@ Given the above output, we could run then run packer:
 
 ```sh
 cd packer
-packer build -var iso_checksum=dc93ded64396574897a5f41d6dd7066c -var iso_url=../out/OSX_InstallESD_10.8.4_12E55.dmg template.json
+packer build \
+  -var iso_checksum=dc93ded64396574897a5f41d6dd7066c \
+  -var iso_url=../out/OSX_InstallESD_10.8.4_12E55.dmg \
+  template.json
 ```
 
 You might also use the `-only` option to restrict to either the `vmware-iso` or `virtualbox-iso` builders.
