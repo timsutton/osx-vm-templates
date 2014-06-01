@@ -3,32 +3,35 @@
     {
       "boot_wait": "2s",
       "disk_size": 20480,
-      "guest_os_type": "darwin12-64",
+      "guest_additions_mode": "disable",
+      "guest_os_type": "MacOS109_64",
+      "hard_drive_interface": "sata",
       "iso_checksum_type": "md5",
       "iso_checksum": "{{user `iso_checksum`}}",
+      "iso_interface": "sata",
       "iso_url": "{{user `iso_url`}}",
       "shutdown_command": "echo 'vagrant'|sudo -S shutdown -h now",
-      "skip_compaction": true,
       "ssh_password": "vagrant",
       "ssh_port": 22,
       "ssh_username": "vagrant",
       "ssh_wait_timeout": "10000s",
-      "tools_upload_flavor": "darwin",
-      "type": "vmware-iso",
-      "vmx_data": {
-        "cpuid.coresPerSocket": "1",
-        "memsize": "2048",
-        "numvcpus": "1",
-        "firmware": "efi",
-        "keyboardAndMouseProfile": "macProfile",
-        "smc.present": "TRUE",
-        "hpet0.present": "TRUE",
-        "ich7m.present": "TRUE",
-        "ehci.present": "TRUE",
-        "usb.present": "TRUE"
-      }
+      "type": "virtualbox-iso",
+      "vboxmanage": [
+        ["modifyvm", "{{.Name}}", "--audiocontroller", "hda"],
+        ["modifyvm", "{{.Name}}", "--boot1", "dvd"],
+        ["modifyvm", "{{.Name}}", "--boot2", "disk"],
+        ["modifyvm", "{{.Name}}", "--chipset", "ich9"],
+        ["modifyvm", "{{.Name}}", "--cpuidset", "00000001", "000306a9", "00020800", "80000201", "178bfbff"],
+        ["modifyvm", "{{.Name}}", "--firmware", "efi"],
+        ["modifyvm", "{{.Name}}", "--hpet", "on"],
+        ["modifyvm", "{{.Name}}", "--keyboard", "usb"],
+        ["modifyvm", "{{.Name}}", "--memory", "2048"],
+        ["modifyvm", "{{.Name}}", "--mouse", "usbtablet"],
+        ["modifyvm", "{{.Name}}", "--vram", "9"]
+      ]
     }
   ],
+  "min_packer_version": "0.6.1",
   "post-processors": [
     "vagrant"
   ],
