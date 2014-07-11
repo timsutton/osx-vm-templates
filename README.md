@@ -106,4 +106,4 @@ A built box with CLI tools, Puppet and Chef is over 5GB in size. It might be adv
 
 ## Alternate approaches to VM provisioning
 
-Mads Fog Albrechtslund documents a [interesting method](http://hazenet.dk/2013/07/17/creating-a-never-booted-os-x-template-in-vsphere-5-1) for converting unbooted .dmg images into VMDK files for use with ESXi.
+Mads Fog Albrechtslund documents an [interesting method](http://hazenet.dk/2013/07/17/creating-a-never-booted-os-x-template-in-vsphere-5-1) for converting unbooted .dmg images into VMDK files for use with ESXi.
