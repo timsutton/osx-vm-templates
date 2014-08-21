@@ -35,10 +35,12 @@ function install_dmg() {
 function get_dmg() {
     local recipe_name="$1"
     local version="$2"
+    local report_path=$(mktemp /tmp/autopkg-report-XXXX)
 
     # Run AutoPkg setting VERSION, and saving the results as a plist
-    "${AUTOPKG}" run --report-plist ${recipe_name} -k VERSION="${version}" > /tmp/autopkg-puppet-report.plist
-    echo $(/usr/libexec/PlistBuddy -c 'Print :new_downloads:0' /tmp/autopkg-puppet-report.plist)
+    "${AUTOPKG}" run --report-plist ${report_path} -k VERSION="${version}" ${recipe_name} > \
+        $(mktemp "/tmp/autopkg-runlog-${recipe_name}")
+    echo $(/usr/libexec/PlistBuddy -c 'Print :new_downloads:0' ${report_path})
 }
 
 # Get AutoPkg
@@ -49,6 +51,8 @@ AUTOPKG="$AUTOPKG_DIR/Code/autopkg"
 # Add the recipes repo containing Puppet/Facter
 "${AUTOPKG}" repo-add recipes
 
+# Redirect AutoPkg cache to a temp location
+defaults write com.github.autopkg CACHE_DIR -string "$(mktemp -d /tmp/autopkg-cache-XXX)"
 # Retrieve the installer DMGs
 PUPPET_DMG=$(get_dmg Puppet.download "${PUPPET_VERSION}")
 FACTER_DMG=$(get_dmg Facter.download "${FACTER_VERSION}")
