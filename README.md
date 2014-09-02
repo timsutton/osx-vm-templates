@@ -2,9 +2,9 @@
 
 This is a set of templates and scripts that will prepare an OS X installer media that performs an unattended install for use with [Packer](http://packer.io) and [VeeWee](http://github.com/jedi4ever/veewee). These were originally developed for VeeWee, but support for the VeeWee template has not been maintained since Packer's release and so it is only provided for historical purposes.
 
-The machine is also configured for use with [Vagrant](http://www.vagrantup.com), using either the [Hashicorp VMware Fusion provider](http://www.vagrantup.com/vmware) or Vagrant's included [VirtualBox provider](http://docs.vagrantup.com/v2/virtualbox/index.html). Use with the Fusion provider requires Vagrant 1.3.0, and use with the VirtualBox provider requires Packer 0.6.2 (unreleased) and Vagrant 1.6.3 if using the Rsync file sync mechanism. Note that the VeeWee template also does not have any VirtualBox support.
+The machine is also configured for use with [Vagrant](http://www.vagrantup.com), using either the [Hashicorp VMware Fusion provider](http://www.vagrantup.com/vmware) or Vagrant's included [VirtualBox provider](http://docs.vagrantup.com/v2/virtualbox/index.html). Use with the Fusion provider requires Vagrant 1.3.0, and use with the VirtualBox provider requires Packer 0.7.0 (unreleased) and Vagrant 1.6.3 if using the Rsync file sync mechanism. Note that the VeeWee template also does not have any VirtualBox support.
 
-While I'd prefer to keep only a single `template.json` for now, because the VirtualBox template requires 0.6.2 which is unreleased, the two builders have been split into two templates. They will be merged back together once 0.6.2 is released. The VirtualBox support requires a new template setting; the open pull request is [here](https://github.com/mitchellh/packer/pull/1200).
+While I'd prefer to keep only a single `template.json` for now, because the VirtualBox template requires 0.7.0 which is unreleased, the two builders have been split into two templates. They will be merged back together once 0.7.0 is released.
 
 Provisioning steps that are defined in the template via items in the [scripts](https://github.com/timsutton/osx-vm-templates/tree/master/scripts) directory:
 - [Vagrant-specific configuration](http://docs.vagrantup.com/v2/boxes/base.html)
