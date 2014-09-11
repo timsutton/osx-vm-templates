@@ -59,6 +59,7 @@
       ]
     }
   ],
+  "min_packer_version": "0.7.0",
   "post-processors": [
     "vagrant"
   ],
