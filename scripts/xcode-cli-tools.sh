@@ -11,11 +11,9 @@ if [ "$OSX_VERS" -ge 9 ]; then
     touch /tmp/.com.apple.dt.CommandLineTools.installondemand.in-progress
 
     # find the CLI Tools update
-    [ "$OSX_VERS" -ge 10 ] && PROD=$(softwareupdate -l | grep "Command Line" | awk -F"*" '{print $2}' | sed -e 's/^ *//' | tr -d '\n')
-    [ "$OSX_VERS" -eq 9 ] && PROD=$(softwareupdate -l | grep -B 1 "Developer" | head -n 1 | awk -F"*" '{print $2}')
 
+    PROD=$(softwareupdate -l | grep "Command Line" | head -n 1 | awk -F"*" '{print $2}' | sed -e 's/^ *//' | tr -d '\n')
     # install it
-    # amazingly, it won't find the update if we put the update ID in double-quotes
     softwareupdate -i "$PROD" -v
  
 # on 10.7/10.8, we instead download from public download URLs, which can be found in
