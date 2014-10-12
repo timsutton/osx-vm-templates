@@ -27,6 +27,14 @@ Run the `prepare_iso.sh` script with two arguments: the path to an `Install OS X
 -- Done. Built image is located at out/OSX_InstallESD_10.8.4_12E55.dmg. Add this iso and its checksum to your template.
 ```
 
+#### Clone this repository
+
+The `prepare_iso.sh` script needs the `support` directory and its content. In other words, the easiest way to run the script is after cloning this repository.
+
+#### Snow Leopard
+
+The `prepare_iso.sh` script depends on `pkgbuild` utility. As `pkgbuild` is not installed on Snow Leopard (contrary to the later OS X), you need to install XCode 3.2.6 which includes it.
+
 ## Use with Packer
 
 The path and checksum can now be added to your Packer template or provided as [user variables](http://www.packer.io/docs/templates/user-variables.html). The `packer` directory contains a template that can be used with the `vmware-iso` and `virtualbox-iso` builders. The `veewee` directory contains a definition, though as mentioned above it is not currently being maintained.
