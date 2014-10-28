@@ -1,6 +1,34 @@
 {
   "builders": [
     {
+      "boot_wait": "5s",
+      "disk_size": 40960,
+      "guest_os_type": "win-8",
+      "iso_checksum_type": "md5",
+      "iso_checksum": "{{user `iso_checksum`}}",
+      "iso_url": "{{user `iso_url`}}",
+      "shutdown_command": "echo 'vagrant'|sudo -S shutdown -h now",
+      "ssh_password": "vagrant",
+      "ssh_port": 22,
+      "ssh_username": "vagrant",
+      "ssh_wait_timeout": "10000s",
+      "parallels_tools_flavor": "mac",
+      "type": "parallels-iso",
+      "prlctl": [
+        ["set", "{{.Name}}", "--memsize", "2048"],
+        ["set", "{{.Name}}", "--memquota", "512:2048"],
+        ["set", "{{.Name}}", "--cpus", "2"],
+        ["set", "{{.Name}}", "--distribution", "macosx"],
+        ["set", "{{.Name}}", "--3d-accelerate", "highest"],
+        ["set", "{{.Name}}", "--high-resolution", "off"],
+        ["set", "{{.Name}}", "--auto-share-camera", "off"],
+        ["set", "{{.Name}}", "--auto-share-bluetooth", "off"],
+        ["set", "{{.Name}}", "--on-window-close", "keep-running"],
+        ["set", "{{.Name}}", "--isolate-vm", "on"],
+        ["set", "{{.Name}}", "--shf-host", "off"]
+      ]
+    },
+    {
       "boot_wait": "2s",
       "disk_size": 20480,
       "guest_os_type": "darwin12-64",
@@ -74,6 +102,7 @@
       "scripts": [
         "../scripts/vagrant.sh",
         "../scripts/vmware.sh",
+        "../scripts/parallels.sh",
         "../scripts/xcode-cli-tools.sh",
         "../scripts/chef-omnibus.sh",
         "../scripts/puppet.sh",

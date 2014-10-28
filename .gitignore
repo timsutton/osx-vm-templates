@@ -4,3 +4,4 @@ packer_cache
 *.box
 AutoPartition-*
 packer/output-*
+*.pvm
