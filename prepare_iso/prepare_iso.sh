@@ -75,6 +75,7 @@ VEEWEE_DIR="$(cd "$SCRIPT_DIR/../../../"; pwd)"
 VEEWEE_UID=$(stat -f %u "$VEEWEE_DIR")
 VEEWEE_GID=$(stat -f %g "$VEEWEE_DIR")
 DEFINITION_DIR="$(cd $SCRIPT_DIR/..; pwd)"
+USER="vagrant"
 
 if [ "$2" == "" ]; then
     msg_error "Currently an explicit output directory is required as the second argument."
@@ -142,15 +143,15 @@ fi
 
 SUPPORT_DIR="$SCRIPT_DIR/support"
 
-# Build our post-installation pkg that will create a vagrant user and enable ssh
+# Build our post-installation pkg that will create a user and enable ssh
 msg_status "Making firstboot installer pkg.."
 
 # payload items
 mkdir -p "$SUPPORT_DIR/pkgroot/private/var/db/dslocal/nodes/Default/users"
 mkdir -p "$SUPPORT_DIR/pkgroot/private/var/db/shadow/hash"
-cp "$SUPPORT_DIR/vagrant.plist" "$SUPPORT_DIR/pkgroot/private/var/db/dslocal/nodes/Default/users/vagrant.plist"
-VAGRANT_GUID=$(/usr/libexec/PlistBuddy -c 'Print :generateduid:0' "$SUPPORT_DIR/vagrant.plist")
-cp "$SUPPORT_DIR/shadowhash" "$SUPPORT_DIR/pkgroot/private/var/db/shadow/hash/$VAGRANT_GUID"
+cp "$SUPPORT_DIR/user.plist" "$SUPPORT_DIR/pkgroot/private/var/db/dslocal/nodes/Default/users/$USER.plist"
+USER_GUID=$(/usr/libexec/PlistBuddy -c 'Print :generateduid:0' "$SUPPORT_DIR/user.plist")
+cp "$SUPPORT_DIR/shadowhash" "$SUPPORT_DIR/pkgroot/private/var/db/shadow/hash/$USER_GUID"
 
 # postinstall script
 mkdir -p "$SUPPORT_DIR/tmp/Scripts"
