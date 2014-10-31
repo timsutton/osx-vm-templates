@@ -1,5 +1,5 @@
 #!/bin/sh
-USER=vagrant
+USER="__USER__PLACEHOLDER__"
 
 # Override the default behavior of sshd on the target volume to be not disabled
 OVERRIDES_PLIST="$3/private/var/db/launchd.db/com.apple.launchd/overrides.plist"
