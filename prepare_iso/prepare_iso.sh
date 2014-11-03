@@ -197,7 +197,7 @@ $SUPPORT_DIR/generate_shadowhash "$PASSWORD" > "$SUPPORT_DIR/pkgroot/private/var
 
 # postinstall script
 mkdir -p "$SUPPORT_DIR/tmp/Scripts"
-cat "$SUPPORT_DIR/pkg-postinstall" | sed -e "s/__USER__PLACEHOLDER/${USER}/" > "$SUPPORT_DIR/tmp/Scripts/postinstall"
+cat "$SUPPORT_DIR/pkg-postinstall" | sed -e "s/__USER__PLACEHOLDER__/${USER}/" > "$SUPPORT_DIR/tmp/Scripts/postinstall"
 chmod a+x "$SUPPORT_DIR/tmp/Scripts/postinstall"
 
 # build it
