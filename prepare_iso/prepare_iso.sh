@@ -65,11 +65,12 @@ if [ $# -eq 0 ]; then
 fi
 
 SCRIPT_DIR="$(cd $(dirname "$0"); pwd)"
+SUPPORT_DIR="$SCRIPT_DIR/support"
 
 # Parse the optional command line switches
 USER="vagrant"
 PASSWORD="vagrant"
-IMAGE_PATH="$SCRIPT_DIR/vagrant.jpg"
+IMAGE_PATH="$SUPPORT_DIR/vagrant.jpg"
 
 while getopts u:p:i: OPT; do
   case "$OPT" in
@@ -180,8 +181,6 @@ if [ -e "$OUTPUT_DMG" ]; then
 	hdiutil detach -force "$MNT_ESD"
 	exit 1
 fi
-
-SUPPORT_DIR="$SCRIPT_DIR/support"
 
 # Build our post-installation pkg that will create a user and enable ssh
 msg_status "Making firstboot installer pkg.."
