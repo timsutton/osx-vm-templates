@@ -201,12 +201,16 @@ cat "$SUPPORT_DIR/pkg-postinstall" | sed -e "s/__USER__PLACEHOLDER__/${USER}/" >
 chmod a+x "$SUPPORT_DIR/tmp/Scripts/postinstall"
 
 # build it
+BUILT_COMPONENT_PKG="$SUPPORT_DIR/tmp/veewee-config-component.pkg"
 BUILT_PKG="$SUPPORT_DIR/tmp/veewee-config.pkg"
 pkgbuild --quiet \
 	--root "$SUPPORT_DIR/pkgroot" \
 	--scripts "$SUPPORT_DIR/tmp/Scripts" \
 	--identifier com.vagrantup.veewee-config \
 	--version 0.1 \
+	"$BUILT_COMPONENT_PKG"
+productbuild \
+	--package "$BUILT_COMPONENT_PKG" \
 	"$BUILT_PKG"
 rm -rf "$SUPPORT_DIR/pkgroot"
 
