@@ -1,8 +1,17 @@
 #!/bin/sh
+
+OSX_VERS=$(sw_vers -productVersion | awk -F "." '{print $2}')
+
 # Override the default behavior of sshd on the target volume to be not disabled
-OVERRIDES_PLIST="$3/private/var/db/launchd.db/com.apple.launchd/overrides.plist"
-/usr/libexec/PlistBuddy -c 'Delete :com.openssh.sshd' "$OVERRIDES_PLIST"
-/usr/libexec/PlistBuddy -c 'Add :com.openssh.sshd:Disabled bool False' "$OVERRIDES_PLIST"
+if [ "$OSX_VERS" -ge 10 ]; then
+    OVERRIDES_PLIST="$3/private/var/db/com.apple.xpc.launchd/disabled.plist"
+    /usr/libexec/PlistBuddy -c 'Delete :com.openssh.sshd' "$OVERRIDES_PLIST"
+    /usr/libexec/PlistBuddy -c 'Add :com.openssh.sshd bool False' "$OVERRIDES_PLIST"
+else
+    OVERRIDES_PLIST="$3/private/var/db/launchd.db/com.apple.launchd/overrides.plist"
+    /usr/libexec/PlistBuddy -c 'Delete :com.openssh.sshd' "$OVERRIDES_PLIST"
+    /usr/libexec/PlistBuddy -c 'Add :com.openssh.sshd:Disabled bool False' "$OVERRIDES_PLIST"
+fi
 
 # Add vagrant to sudoers
 cp "$3/etc/sudoers" "$3/etc/sudoers.orig"
