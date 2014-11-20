@@ -1,5 +1,9 @@
 #!/usr/bin/env python
 
+# Port of Gavin Brock's Perl kcpassword generator to Python, by Tom Taylor
+# <tom@tomtaylor.co.uk>.
+# Perl version: http://www.brock-family.org/gavin/perl/kcpassword.html
+
 import sys
 import os
 
