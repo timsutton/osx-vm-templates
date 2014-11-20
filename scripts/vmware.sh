@@ -1,6 +1,6 @@
 #!/bin/sh
 
-TOOLS_PATH="/Users/$ROOT_USERNAME/darwin.iso"
+TOOLS_PATH="/Users/$USERNAME/darwin.iso"
 # VMware Fusion specific items
 if [ -e .vmfusion_version ] || [[ "$PACKER_BUILDER_TYPE" == vmware* ]]; then
     if [ ! -e "$TOOLS_PATH" ]; then

@@ -7,10 +7,10 @@
       "iso_checksum_type": "md5",
       "iso_checksum": "{{user `iso_checksum`}}",
       "iso_url": "{{user `iso_url`}}",
-      "shutdown_command": "echo '{{user `root_username`}}'|sudo -S shutdown -h now",
+      "shutdown_command": "echo '{{user `username`}}'|sudo -S shutdown -h now",
       "ssh_port": 22,
-      "ssh_username": "{{user `root_username`}}",
-      "ssh_password": "{{user `root_password`}}",
+      "ssh_username": "{{user `username`}}",
+      "ssh_password": "{{user `password`}}",
       "ssh_wait_timeout": "10000s",
       "parallels_tools_flavor": "mac",
       "type": "parallels-iso",
@@ -35,11 +35,11 @@
       "iso_checksum_type": "md5",
       "iso_checksum": "{{user `iso_checksum`}}",
       "iso_url": "{{user `iso_url`}}",
-      "shutdown_command": "echo '{{user `root_username`}}'|sudo -S shutdown -h now",
+      "shutdown_command": "echo '{{user `username`}}'|sudo -S shutdown -h now",
       "skip_compaction": true,
       "ssh_port": 22,
-      "ssh_username": "{{user `root_username`}}",
-      "ssh_password": "{{user `root_password`}}",
+      "ssh_username": "{{user `username`}}",
+      "ssh_password": "{{user `password`}}",
       "ssh_wait_timeout": "10000s",
       "tools_upload_flavor": "darwin",
       "type": "vmware-iso",
@@ -66,10 +66,10 @@
       "iso_checksum": "{{user `iso_checksum`}}",
       "iso_interface": "sata",
       "iso_url": "{{user `iso_url`}}",
-      "shutdown_command": "echo '{{user `root_username`}}'|sudo -S shutdown -h now",
+      "shutdown_command": "echo '{{user `username`}}'|sudo -S shutdown -h now",
       "ssh_port": 22,
-      "ssh_username": "{{user `root_username`}}",
-      "ssh_password": "{{user `root_password`}}",
+      "ssh_username": "{{user `username`}}",
+      "ssh_password": "{{user `password`}}",
       "ssh_wait_timeout": "10000s",
       "type": "virtualbox-iso",
       "vboxmanage": [
@@ -104,8 +104,8 @@
         "../scripts/add-network-interface-detection.sh"
       ],
       "environment_vars": [
-        "ROOT_VAGRANT_KEYS={{user `root_vagrant_keys`}}",
-        "ROOT_USERNAME={{user `root_username`}}"
+        "INSTALL_VAGRANT_KEYS={{user `install_vagrant_keys`}}",
+        "USERNAME={{user `username`}}"
       ],
       "type": "shell"
     },
@@ -117,10 +117,10 @@
     {
       "execute_command": "chmod +x {{ .Path }}; sudo {{ .Vars }} {{ .Path }}",
       "inline": [
-        "if [ \"{{user `root_autologin`}}\" != \"true\" ] && [ \"{{user `root_autologin`}}\" != \"1\" ]; then exit; fi",
-        "echo \"Enabling automatic GUI login for the '{{user `root_username`}}' user..\"",
-        "python /private/tmp/set_kcpassword.py \"{{user `root_password`}}\"",
-        "/usr/bin/defaults write /Library/Preferences/com.apple.loginwindow autoLoginUser \"{{user `root_username`}}\""
+        "if [ \"{{user `autologin`}}\" != \"true\" ] && [ \"{{user `autologin`}}\" != \"1\" ]; then exit; fi",
+        "echo \"Enabling automatic GUI login for the '{{user `username`}}' user..\"",
+        "python /private/tmp/set_kcpassword.py \"{{user `password`}}\"",
+        "/usr/bin/defaults write /Library/Preferences/com.apple.loginwindow autoLoginUser \"{{user `username`}}\""
       ],
       "type": "shell"
     }
@@ -128,9 +128,9 @@
   "variables": {
     "iso_checksum": "aff67f81dfbad7afda56c423473d61a6",
     "iso_url": "OSX_InstallESD_10.9.3_13D65.dmg",
-    "root_username": "vagrant",
-    "root_password": "vagrant",
-    "root_autologin": true,
-    "root_vagrant_keys": true
+    "username": "vagrant",
+    "password": "vagrant",
+    "autologin": true,
+    "install_vagrant_keys": true
   }
 }
