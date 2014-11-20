@@ -225,7 +225,7 @@ hdiutil convert -format UDRW -o "$BASE_SYSTEM_DMG_RW" "$BASE_SYSTEM_DMG"
 
 if [ $DMG_OS_VERS_MAJOR -ge 9 ]; then
 	msg_status "Growing new BaseSystem.."
-	hdiutil resize -size 6G "$BASE_SYSTEM_DMG_RW"
+	hdiutil resize -size 7G "$BASE_SYSTEM_DMG_RW"
 fi
 
 msg_status "Mounting new BaseSystem.."
@@ -235,6 +235,13 @@ if [ $DMG_OS_VERS_MAJOR -ge 9 ]; then
 	msg_status "Moving 'Packages' directory from the ESD to BaseSystem.."
 	mv -v "$MNT_ESD/Packages" "$MNT_BASE_SYSTEM/System/Installation/"
 	PACKAGES_DIR="$MNT_BASE_SYSTEM/System/Installation/Packages"
+
+	# This isn't strictly required for Mavericks, but Yosemite will consider the
+	# installer corrupt if this isn't included, because it cannot verify BaseSystem's
+	# consistency and perform a recovery partition verification
+	msg_status "Copying in original BaseSystem dmg and chunklist.."
+	cp "$MNT_ESD/BaseSystem.dmg" "$MNT_BASE_SYSTEM/"
+	cp "$MNT_ESD/BaseSystem.chunklist" "$MNT_BASE_SYSTEM/"
 else
 	PACKAGES_DIR="$MNT_ESD/Packages"
 fi

@@ -8,7 +8,7 @@ Provisioning steps that are defined in the template via items in the [scripts](h
 - [Vagrant-specific configuration](http://docs.vagrantup.com/v2/boxes/base.html)
 - VM guest tools installation if on VMware
 - Xcode CLI tools installation
-- Chef installation via the [Opscode Omnibus installer](http://www.opscode.com/chef/install)
+- Chef installation via the [Chef client installer for OS X](https://www.getchef.com/download-chef-client)
 - Puppet installation via [AutoPkg](https://github.com/autopkg/autopkg) [recipes](https://github.com/autopkg/recipes/tree/master/Puppetlabs)
 
 
