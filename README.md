@@ -2,7 +2,9 @@
 
 This is a set of Packer templates and support scripts that will prepare an OS X installer media that performs an unattended install for use with [Packer](http://packer.io) and [VeeWee](http://github.com/jedi4ever/veewee). These were originally developed for VeeWee, but support for the VeeWee template has not been maintained since Packer's release and so it is only provided for historical purposes.
 
-The machine is also configured for use with [Vagrant](http://www.vagrantup.com), using either the [Hashicorp VMware Fusion provider](http://www.vagrantup.com/vmware) or Vagrant's included [VirtualBox provider](http://docs.vagrantup.com/v2/virtualbox/index.html). Use with the Fusion provider requires Vagrant 1.3.0, and use with the VirtualBox provider Vagrant 1.6.3 if using the Rsync file sync mechanism. Note that the VeeWee template also does not have any VirtualBox support.
+The machine defaults to being configured for use with [Vagrant](http://www.vagrantup.com), using either the [Hashicorp VMware Fusion provider](http://www.vagrantup.com/vmware) or Vagrant's included [VirtualBox provider](http://docs.vagrantup.com/v2/virtualbox/index.html). You can override this, to build a machine with different admin account settings, and without the vagrant ssh keys.
+
+Use with the Fusion provider requires Vagrant 1.3.0, and use with the VirtualBox provider Vagrant 1.6.3 if using the Rsync file sync mechanism. Note that the VeeWee template also does not have any VirtualBox support.
 
 Provisioning steps that are defined in the template via items in the [scripts](https://github.com/timsutton/osx-vm-templates/tree/master/scripts) directory:
 - [Vagrant-specific configuration](http://docs.vagrantup.com/v2/boxes/base.html)
@@ -27,7 +29,7 @@ Run the `prepare_iso.sh` script with two arguments: the path to an `Install OS X
 -- Done. Built image is located at out/OSX_InstallESD_10.8.4_12E55.dmg. Add this iso and its checksum to your template.
 ```
 
-`prepare_iso.sh` also accepts three command line switches to modify the details of the admin user that's installed by the script.
+`prepare_iso.sh` also accepts three command line switches to modify the details of the admin user installed by the script.
 
 * `-u` modifies the name of the admin account, defaulting to `vagrant`
 * `-p` modifies the password of the same account, defaulting to `vagrant`
@@ -63,6 +65,21 @@ packer build \
 
 You might also use the `-only` option to restrict to either the `vmware-iso` or `virtualbox-iso` builders.
 
+If you modified the name or password of the admin account in the `prepare_iso` stage, you'll need to pass in the modified details as packer variables. You can also prevent the vagrant SSH keys from being installed for that user.
+
+For example:
+
+```
+packer build \
+  -var iso_checksum=dc93ded64396574897a5f41d6dd7066c \
+  -var iso_url=../out/OSX_InstallESD_10.8.4_12E55.dmg \
+  -var username=youruser \
+  -var password=yourpassword \
+  -var install_vagrant_keys=false \
+  template.json
+```
+
+
 ## Automated installs on OS X
 
 OS X's installer supports a kind of bootstrap install functionality similar to Linux and Windows, however it must be invoked using pre-existing files placed on the booted installation media. This approach is roughly equivalent to that used by Apple's System Image Utility for deploying automated OS X installations and image restoration.
@@ -79,9 +96,9 @@ Currently the prepare script supports Lion, Mountain Lion, and Mavericks.
 
 ## Automated GUI logins
 
-For some kinds of automated tasks, it may be necessary to have an active GUI login session (for example, test suites requiring a GUI, or Jenkins SSH slaves requiring a window server for their tasks). The Packer templates support enabling this automatically by using the `autologin_vagrant_user` user variable, which can be set to anything non-zero, for example:
+For some kinds of automated tasks, it may be necessary to have an active GUI login session (for example, test suites requiring a GUI, or Jenkins SSH slaves requiring a window server for their tasks). The Packer templates support enabling this automatically by using the `autologin` user variable, which can be set to `1` or `true`, for example:
 
-`packer build -var autologin_vagrant_user=yes template.json`
+`packer build -var autologin=true template.json`
 
 This was easily made possible thanks to Per Olofsson's [CreateUserPkg](http://magervalp.github.com/CreateUserPkg) utility, which was used to help create the box's vagrant user in the `prepare_iso` script, and which also supports generating the magic kcpassword file with a particular hash format to set up the auto-login.
 
