@@ -130,7 +130,7 @@
     "iso_url": "OSX_InstallESD_10.9.3_13D65.dmg",
     "username": "vagrant",
     "password": "vagrant",
-    "autologin": true,
+    "autologin": false,
     "install_vagrant_keys": true
   }
 }
