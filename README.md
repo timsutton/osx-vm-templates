@@ -27,6 +27,16 @@ Run the `prepare_iso.sh` script with two arguments: the path to an `Install OS X
 -- Done. Built image is located at out/OSX_InstallESD_10.8.4_12E55.dmg. Add this iso and its checksum to your template.
 ```
 
+`prepare_iso.sh` also accepts three command line switches to modify the details of the admin user that's installed by the script.
+
+* `-u` modifies the name of the admin account, defaulting to `vagrant`
+* `-p` modifies the password of the same account, defaulting to `vagrant`
+* `-i` sets the path of the account's avatar image, defaulting to `prepare_iso/support/vagrant.jpg`
+
+For example:
+
+`sudo prepare_iso/prepare_iso.sh -u admin -p password -i /path/to/image.jpg "/Applications/Install OS X Mountain Lion.app" out`
+
 #### Clone this repository
 
 The `prepare_iso.sh` script needs the `support` directory and its content. In other words, the easiest way to run the script is after cloning this repository.
