@@ -1,16 +1,17 @@
 #!/bin/sh
 USER="__USER__PLACEHOLDER__"
 OSX_VERS=$(sw_vers -productVersion | awk -F "." '{print $2}')
+PlistBuddy="/usr/libexec/PlistBuddy"
 
 # Override the default behavior of sshd on the target volume to be not disabled
 if [ "$OSX_VERS" -ge 10 ]; then
     OVERRIDES_PLIST="$3/private/var/db/com.apple.xpc.launchd/disabled.plist"
-    /usr/libexec/PlistBuddy -c 'Delete :com.openssh.sshd' "$OVERRIDES_PLIST"
-    /usr/libexec/PlistBuddy -c 'Add :com.openssh.sshd bool False' "$OVERRIDES_PLIST"
+    $PlistBuddy -c 'Delete :com.openssh.sshd' "$OVERRIDES_PLIST"
+    $PlistBuddy -c 'Add :com.openssh.sshd bool False' "$OVERRIDES_PLIST"
 else
     OVERRIDES_PLIST="$3/private/var/db/launchd.db/com.apple.launchd/overrides.plist"
-    /usr/libexec/PlistBuddy -c 'Delete :com.openssh.sshd' "$OVERRIDES_PLIST"
-    /usr/libexec/PlistBuddy -c 'Add :com.openssh.sshd:Disabled bool False' "$OVERRIDES_PLIST"
+    $PlistBuddy -c 'Delete :com.openssh.sshd' "$OVERRIDES_PLIST"
+    $PlistBuddy -c 'Add :com.openssh.sshd:Disabled bool False' "$OVERRIDES_PLIST"
 fi
 
 # Add user to sudoers
@@ -18,19 +19,19 @@ cp "$3/etc/sudoers" "$3/etc/sudoers.orig"
 echo "$USER ALL=(ALL) NOPASSWD: ALL" >> "$3/etc/sudoers"
 
 # Add user to admin group memberships (even though GID 80 is enough for most things)
-USER_GUID=$(/usr/libexec/PlistBuddy -c 'Print :generateduid:0' "$3/private/var/db/dslocal/nodes/Default/users/$USER.plist")
-USER_UID=$(/usr/libexec/PlistBuddy -c 'Print :uid:0' "$3/private/var/db/dslocal/nodes/Default/users/$USER.plist")
-/usr/libexec/PlistBuddy -c 'Add :groupmembers: string $USER_GUID' "$3/private/var/db/dslocal/nodes/Default/groups/admin.plist"
+USER_GUID=$($PlistBuddy -c 'Print :generateduid:0' "$3/private/var/db/dslocal/nodes/Default/users/$USER.plist")
+USER_UID=$($PlistBuddy -c 'Print :uid:0' "$3/private/var/db/dslocal/nodes/Default/users/$USER.plist")
+$PlistBuddy -c 'Add :groupmembers: string $USER_GUID' "$3/private/var/db/dslocal/nodes/Default/groups/admin.plist"
 
 # Pre-create user folder so veewee will have somewhere to scp configinfo to
 mkdir -p "$3/Users/$USER/Library/Preferences"
 
 # Suppress annoying iCloud welcome on a GUI login
-/usr/libexec/PlistBuddy -c 'Add :DidSeeCloudSetup bool true' "$3/Users/$USER/Library/Preferences/com.apple.SetupAssistant.plist"
-/usr/libexec/PlistBuddy -c 'Add :LastSeenCloudProductVersion string 10.9' "$3/Users/$USER/Library/Preferences/com.apple.SetupAssistant.plist"
+$PlistBuddy -c 'Add :DidSeeCloudSetup bool true' "$3/Users/$USER/Library/Preferences/com.apple.SetupAssistant.plist"
+$PlistBuddy -c 'Add :LastSeenCloudProductVersion string 10.9' "$3/Users/$USER/Library/Preferences/com.apple.SetupAssistant.plist"
 
 # Disable loginwindow screensaver to save CPU cycles
-/usr/libexec/PlistBuddy -c 'Add :loginWindowIdleTime integer 0' "$3/Library/Preferences/com.apple.screensaver.plist"
+$PlistBuddy -c 'Add :loginWindowIdleTime integer 0' "$3/Library/Preferences/com.apple.screensaver.plist"
 
 # Fix ownership now that the above has made a Library folder as root
 chown -R $USER_UID:20 "$3/Users/$USER"
