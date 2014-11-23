@@ -21,7 +21,7 @@ echo "$USER ALL=(ALL) NOPASSWD: ALL" >> "$3/etc/sudoers"
 # Add user to admin group memberships (even though GID 80 is enough for most things)
 USER_GUID=$($PlistBuddy -c 'Print :generateduid:0' "$3/private/var/db/dslocal/nodes/Default/users/$USER.plist")
 USER_UID=$($PlistBuddy -c 'Print :uid:0' "$3/private/var/db/dslocal/nodes/Default/users/$USER.plist")
-$PlistBuddy -c 'Add :groupmembers: string $USER_GUID' "$3/private/var/db/dslocal/nodes/Default/groups/admin.plist"
+$PlistBuddy -c 'Add :groupmembers: string '"$USER_GUID" "$3/private/var/db/dslocal/nodes/Default/groups/admin.plist"
 
 # Pre-create user folder so veewee will have somewhere to scp configinfo to
 mkdir -p "$3/Users/$USER/Library/Preferences"
