@@ -33,6 +33,29 @@ $PlistBuddy -c 'Add :LastSeenCloudProductVersion string 10.'"$OSX_VERS" "$3/User
 # Fix ownership now that the above has made a Library folder as root
 chown -R "$USER_UID":20 "$3/Users/$USER"
 
+# Disable Diagnostics submissions prompt if 10.10
+# http://macops.ca/diagnostics-prompt-yosemite
+if [ "$OSX_VERS" -ge 10 ]; then
+    # Apple's defaults
+    SUBMIT_TO_APPLE=YES
+    SUBMIT_TO_APP_DEVELOPERS=NO
+
+    CRASHREPORTER_SUPPORT="$3/Library/Application Support/CrashReporter"
+    CRASHREPORTER_DIAG_PLIST="${CRASHREPORTER_SUPPORT}/DiagnosticMessagesHistory.plist"
+    if [ ! -d "${CRASHREPORTER_SUPPORT}" ]; then
+        mkdir "${CRASHREPORTER_SUPPORT}"
+        chmod 775 "${CRASHREPORTER_SUPPORT}"
+        chown root:admin "${CRASHREPORTER_SUPPORT}"
+    fi
+    for key in AutoSubmit AutoSubmitVersion ThirdPartyDataSubmit ThirdPartyDataSubmitVersion; do
+        $PlistBuddy -c "Delete :$key" "${CRASHREPORTER_DIAG_PLIST}" 2> /dev/null
+    done
+    $PlistBuddy -c "Add :AutoSubmit bool ${SUBMIT_TO_APPLE}" "${CRASHREPORTER_DIAG_PLIST}"
+    $PlistBuddy -c "Add :AutoSubmitVersion integer 4" "${CRASHREPORTER_DIAG_PLIST}"
+    $PlistBuddy -c "Add :ThirdPartyDataSubmit bool ${SUBMIT_TO_APP_DEVELOPERS}" "${CRASHREPORTER_DIAG_PLIST}"
+    $PlistBuddy -c "Add :ThirdPartyDataSubmitVersion integer 4" "${CRASHREPORTER_DIAG_PLIST}"
+fi
+
 # Disable loginwindow screensaver to save CPU cycles
 $PlistBuddy -c 'Add :loginWindowIdleTime integer 0' "$3/Library/Preferences/com.apple.screensaver.plist"
 
