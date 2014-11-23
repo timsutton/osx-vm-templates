@@ -30,11 +30,11 @@ mkdir -p "$3/Users/$USER/Library/Preferences"
 $PlistBuddy -c 'Add :DidSeeCloudSetup bool true' "$3/Users/$USER/Library/Preferences/com.apple.SetupAssistant.plist"
 $PlistBuddy -c 'Add :LastSeenCloudProductVersion string 10.'"$OSX_VERS" "$3/Users/$USER/Library/Preferences/com.apple.SetupAssistant.plist"
 
+# Fix ownership now that the above has made a Library folder as root
+chown -R "$USER_UID":20 "$3/Users/$USER"
+
 # Disable loginwindow screensaver to save CPU cycles
 $PlistBuddy -c 'Add :loginWindowIdleTime integer 0' "$3/Library/Preferences/com.apple.screensaver.plist"
-
-# Fix ownership now that the above has made a Library folder as root
-chown -R $USER_UID:20 "$3/Users/$USER"
 
 # Disable the welcome screen
 touch "$3/private/var/db/.AppleSetupDone"
