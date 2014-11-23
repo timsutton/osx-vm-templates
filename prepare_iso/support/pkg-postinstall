@@ -1,5 +1,5 @@
 #!/bin/sh
-
+USER="__USER__PLACEHOLDER__"
 OSX_VERS=$(sw_vers -productVersion | awk -F "." '{print $2}')
 
 # Override the default behavior of sshd on the target volume to be not disabled
@@ -13,27 +13,27 @@ else
     /usr/libexec/PlistBuddy -c 'Add :com.openssh.sshd:Disabled bool False' "$OVERRIDES_PLIST"
 fi
 
-# Add vagrant to sudoers
+# Add user to sudoers
 cp "$3/etc/sudoers" "$3/etc/sudoers.orig"
-echo 'vagrant ALL=(ALL) NOPASSWD: ALL' >> "$3/etc/sudoers"
+echo "$USER ALL=(ALL) NOPASSWD: ALL" >> "$3/etc/sudoers"
 
-# Add vagrant to admin group memberships (even though GID 80 is enough for most things)
-VAGRANT_GUID=$(/usr/libexec/PlistBuddy -c 'Print :generateduid:0' "$3/private/var/db/dslocal/nodes/Default/users/vagrant.plist")
-VAGRANT_UID=$(/usr/libexec/PlistBuddy -c 'Print :uid:0' "$3/private/var/db/dslocal/nodes/Default/users/vagrant.plist")
-/usr/libexec/PlistBuddy -c 'Add :groupmembers: string $VAGRANT_GUID' "$3/private/var/db/dslocal/nodes/Default/groups/admin.plist"
+# Add user to admin group memberships (even though GID 80 is enough for most things)
+USER_GUID=$(/usr/libexec/PlistBuddy -c 'Print :generateduid:0' "$3/private/var/db/dslocal/nodes/Default/users/$USER.plist")
+USER_UID=$(/usr/libexec/PlistBuddy -c 'Print :uid:0' "$3/private/var/db/dslocal/nodes/Default/users/$USER.plist")
+/usr/libexec/PlistBuddy -c 'Add :groupmembers: string $USER_GUID' "$3/private/var/db/dslocal/nodes/Default/groups/admin.plist"
 
-# Pre-create vagrant user folder so veewee will have somewhere to scp configinfo to
-mkdir -p "$3/Users/vagrant/Library/Preferences"
+# Pre-create user folder so veewee will have somewhere to scp configinfo to
+mkdir -p "$3/Users/$USER/Library/Preferences"
 
 # Suppress annoying iCloud welcome on a GUI login
-/usr/libexec/PlistBuddy -c 'Add :DidSeeCloudSetup bool true' "$3/Users/vagrant/Library/Preferences/com.apple.SetupAssistant.plist"
-/usr/libexec/PlistBuddy -c 'Add :LastSeenCloudProductVersion string 10.9' "$3/Users/vagrant/Library/Preferences/com.apple.SetupAssistant.plist"
+/usr/libexec/PlistBuddy -c 'Add :DidSeeCloudSetup bool true' "$3/Users/$USER/Library/Preferences/com.apple.SetupAssistant.plist"
+/usr/libexec/PlistBuddy -c 'Add :LastSeenCloudProductVersion string 10.9' "$3/Users/$USER/Library/Preferences/com.apple.SetupAssistant.plist"
 
 # Disable loginwindow screensaver to save CPU cycles
 /usr/libexec/PlistBuddy -c 'Add :loginWindowIdleTime integer 0' "$3/Library/Preferences/com.apple.screensaver.plist"
 
 # Fix ownership now that the above has made a Library folder as root
-chown -R $VAGRANT_UID:20 "$3/Users/vagrant"
+chown -R $USER_UID:20 "$3/Users/$USER"
 
 # Disable the welcome screen
 touch "$3/private/var/db/.AppleSetupDone"

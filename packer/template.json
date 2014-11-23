@@ -7,10 +7,10 @@
       "iso_checksum_type": "md5",
       "iso_checksum": "{{user `iso_checksum`}}",
       "iso_url": "{{user `iso_url`}}",
-      "shutdown_command": "echo 'vagrant'|sudo -S shutdown -h now",
-      "ssh_password": "vagrant",
+      "shutdown_command": "echo '{{user `username`}}'|sudo -S shutdown -h now",
       "ssh_port": 22,
-      "ssh_username": "vagrant",
+      "ssh_username": "{{user `username`}}",
+      "ssh_password": "{{user `password`}}",
       "ssh_wait_timeout": "10000s",
       "parallels_tools_flavor": "mac",
       "type": "parallels-iso",
@@ -35,11 +35,11 @@
       "iso_checksum_type": "md5",
       "iso_checksum": "{{user `iso_checksum`}}",
       "iso_url": "{{user `iso_url`}}",
-      "shutdown_command": "echo 'vagrant'|sudo -S shutdown -h now",
+      "shutdown_command": "echo '{{user `username`}}'|sudo -S shutdown -h now",
       "skip_compaction": true,
-      "ssh_password": "vagrant",
       "ssh_port": 22,
-      "ssh_username": "vagrant",
+      "ssh_username": "{{user `username`}}",
+      "ssh_password": "{{user `password`}}",
       "ssh_wait_timeout": "10000s",
       "tools_upload_flavor": "darwin",
       "type": "vmware-iso",
@@ -66,10 +66,10 @@
       "iso_checksum": "{{user `iso_checksum`}}",
       "iso_interface": "sata",
       "iso_url": "{{user `iso_url`}}",
-      "shutdown_command": "echo 'vagrant'|sudo -S shutdown -h now",
-      "ssh_password": "vagrant",
+      "shutdown_command": "echo '{{user `username`}}'|sudo -S shutdown -h now",
       "ssh_port": 22,
-      "ssh_username": "vagrant",
+      "ssh_username": "{{user `username`}}",
+      "ssh_password": "{{user `password`}}",
       "ssh_wait_timeout": "10000s",
       "type": "virtualbox-iso",
       "vboxmanage": [
@@ -93,11 +93,6 @@
   ],
   "provisioners": [
     {
-      "destination": "/private/tmp/kcpassword",
-      "source": "../scripts/support/kcpassword",
-      "type": "file"
-    },
-    {
       "execute_command": "chmod +x {{ .Path }}; sudo {{ .Vars }} {{ .Path }}",
       "scripts": [
         "../scripts/vagrant.sh",
@@ -108,22 +103,34 @@
         "../scripts/puppet.sh",
         "../scripts/add-network-interface-detection.sh"
       ],
+      "environment_vars": [
+        "INSTALL_VAGRANT_KEYS={{user `install_vagrant_keys`}}",
+        "USERNAME={{user `username`}}"
+      ],
       "type": "shell"
+    },
+    {
+      "destination": "/private/tmp/set_kcpassword.py",
+      "source": "../scripts/support/set_kcpassword.py",
+      "type": "file"
     },
     {
       "execute_command": "chmod +x {{ .Path }}; sudo {{ .Vars }} {{ .Path }}",
       "inline": [
-        "[ -z \"{{user `autologin_vagrant_user`}}\" ] && exit",
-        "echo \"Enabling automatic GUI login for the 'vagrant' user..\"",
-        "cp /private/tmp/kcpassword /private/etc/kcpassword",
-        "/usr/bin/defaults write /Library/Preferences/com.apple.loginwindow autoLoginUser vagrant"
+        "if [ \"{{user `autologin`}}\" != \"true\" ] && [ \"{{user `autologin`}}\" != \"1\" ]; then exit; fi",
+        "echo \"Enabling automatic GUI login for the '{{user `username`}}' user..\"",
+        "python /private/tmp/set_kcpassword.py \"{{user `password`}}\"",
+        "/usr/bin/defaults write /Library/Preferences/com.apple.loginwindow autoLoginUser \"{{user `username`}}\""
       ],
       "type": "shell"
     }
   ],
   "variables": {
-    "autologin_vagrant_user": "",
     "iso_checksum": "aff67f81dfbad7afda56c423473d61a6",
-    "iso_url": "OSX_InstallESD_10.9.3_13D65.dmg"
+    "iso_url": "OSX_InstallESD_10.9.3_13D65.dmg",
+    "username": "vagrant",
+    "password": "vagrant",
+    "autologin": false,
+    "install_vagrant_keys": true
   }
 }

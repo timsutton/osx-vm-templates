@@ -27,13 +27,23 @@
 usage() {
 	cat <<EOF
 Usage:
-$(basename "$0") "/path/to/InstallESD.dmg" /path/to/output/directory
-$(basename "$0") "/path/to/Install OS X [Mountain] Lion.app" /path/to/output/directory
+$(basename "$0") [-upi] "/path/to/InstallESD.dmg" /path/to/output/directory
+$(basename "$0") [-upi] "/path/to/Install OS X [Mountain] Lion.app" /path/to/output/directory
 
 Description:
 Converts a 10.7/10.8/10.9 installer image to a new image that contains components
 used to perform an automated installation. The new image will be named
 'OSX_InstallESD_[osversion].dmg.'
+
+Optional switches:
+  -u <user>
+    Sets the username of the root user, defaults to 'vagrant'.
+
+  -p <password>
+    Sets the password of the root user, defaults to 'vagrant'.
+
+  -i <path to image>
+    Sets the path of the avatar image for the root user, defaulting to the vagrant icon.
 
 EOF
 }
@@ -45,15 +55,48 @@ msg_error() {
 	echo "\033[0;31m-- $1\033[0m"
 }
 
+render_template() {
+  eval "echo \"$(cat $1)\""
+}
+
 if [ $# -eq 0 ]; then
 	usage
 	exit 1
 fi
 
+SCRIPT_DIR="$(cd $(dirname "$0"); pwd)"
+SUPPORT_DIR="$SCRIPT_DIR/support"
+
+# Parse the optional command line switches
+USER="vagrant"
+PASSWORD="vagrant"
+IMAGE_PATH="$SUPPORT_DIR/vagrant.jpg"
+
+while getopts u:p:i: OPT; do
+  case "$OPT" in
+    u)
+      USER="$OPTARG"
+      ;;
+    p)
+      PASSWORD="$OPTARG"
+      ;;
+    i)
+      IMAGE_PATH="$OPTARG"
+      ;;
+    \?)
+      usage
+      exit 1
+      ;;
+  esac
+done
+
+# Remove the switches we parsed above.
+shift `expr $OPTIND - 1`
+
 if [ $(id -u) -ne 0 ]; then
 	msg_error "This script must be run as root, as it saves a disk image with ownerships enabled."
 	exit 1
-fi	
+fi
 
 ESD="$1"
 if [ ! -e "$ESD" ]; then
@@ -70,7 +113,6 @@ if [ -d "$ESD" ]; then
 	fi
 fi
 
-SCRIPT_DIR="$(cd $(dirname "$0"); pwd)"
 VEEWEE_DIR="$(cd "$SCRIPT_DIR/../../../"; pwd)"
 VEEWEE_UID=$(stat -f %u "$VEEWEE_DIR")
 VEEWEE_GID=$(stat -f %g "$VEEWEE_DIR")
@@ -140,26 +182,23 @@ if [ -e "$OUTPUT_DMG" ]; then
 	exit 1
 fi
 
-SUPPORT_DIR="$SCRIPT_DIR/support"
-
-# Build our post-installation pkg that will create a vagrant user and enable ssh
+# Build our post-installation pkg that will create a user and enable ssh
 msg_status "Making firstboot installer pkg.."
 
 # payload items
 mkdir -p "$SUPPORT_DIR/pkgroot/private/var/db/dslocal/nodes/Default/users"
 mkdir -p "$SUPPORT_DIR/pkgroot/private/var/db/shadow/hash"
-cp "$SUPPORT_DIR/vagrant.plist" "$SUPPORT_DIR/pkgroot/private/var/db/dslocal/nodes/Default/users/vagrant.plist"
-VAGRANT_GUID=$(/usr/libexec/PlistBuddy -c 'Print :generateduid:0' "$SUPPORT_DIR/vagrant.plist")
-cp "$SUPPORT_DIR/shadowhash" "$SUPPORT_DIR/pkgroot/private/var/db/shadow/hash/$VAGRANT_GUID"
+BASE64_IMAGE=$(openssl base64 -in "$IMAGE_PATH")
+# Replace USER and BASE64_IMAGE in the user.plist file with the actual user and image
+render_template "$SUPPORT_DIR/user.plist" > "$SUPPORT_DIR/pkgroot/private/var/db/dslocal/nodes/Default/users/$USER.plist"
+USER_GUID=$(/usr/libexec/PlistBuddy -c 'Print :generateduid:0' "$SUPPORT_DIR/user.plist")
+# Generate a shadowhash from the supplied password
+$SUPPORT_DIR/generate_shadowhash "$PASSWORD" > "$SUPPORT_DIR/pkgroot/private/var/db/shadow/hash/$USER_GUID"
 
 # postinstall script
 mkdir -p "$SUPPORT_DIR/tmp/Scripts"
-cp "$SUPPORT_DIR/pkg-postinstall" "$SUPPORT_DIR/tmp/Scripts/postinstall"
-# executability should be copied over, warn if we had to chmod again
-if [ ! -x "$SUPPORT_DIR/tmp/Scripts/postinstall" ]; then
-	msg_status "'postinstall' script was for some reason not executable. Setting it again now, but it should have been already set when copying the definition."
-	chmod a+x "$SUPPORT_DIR/tmp/Scripts/postinstall"
-fi
+cat "$SUPPORT_DIR/pkg-postinstall" | sed -e "s/__USER__PLACEHOLDER__/${USER}/" > "$SUPPORT_DIR/tmp/Scripts/postinstall"
+chmod a+x "$SUPPORT_DIR/tmp/Scripts/postinstall"
 
 # build it
 BUILT_COMPONENT_PKG="$SUPPORT_DIR/tmp/veewee-config-component.pkg"

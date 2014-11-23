@@ -2,7 +2,7 @@
 
 set -eo pipefail
 
-TOOLS_PATH="/Users/vagrant/prl-tools-mac.iso"
+TOOLS_PATH="/Users/$USERNAME/prl-tools-mac.iso"
 # Parallels Tools specific items
 if [ -e .PACKER_BUILDER_TYPE ] || [[ "$PACKER_BUILDER_TYPE" == parallels* ]]; then
     if [ ! -e "$TOOLS_PATH" ]; then
