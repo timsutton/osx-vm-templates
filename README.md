@@ -91,7 +91,7 @@ More details as to the modifications to the installer media are provided in the 
 
 ## Supported guest OS versions
 
-Currently the prepare script supports Lion, Mountain Lion, and Mavericks.
+Currently this prepare script and template supports OS X Lion (10.7) through Yosemite (10.10).
 
 
 ## Automated GUI logins
