@@ -28,10 +28,10 @@ usage() {
 	cat <<EOF
 Usage:
 $(basename "$0") [-upi] "/path/to/InstallESD.dmg" /path/to/output/directory
-$(basename "$0") [-upi] "/path/to/Install OS X [Mountain] Lion.app" /path/to/output/directory
+$(basename "$0") [-upi] "/path/to/Install OS X [Name].app" /path/to/output/directory
 
 Description:
-Converts a 10.7/10.8/10.9 installer image to a new image that contains components
+Converts an OS X installer to a new image that contains components
 used to perform an automated installation. The new image will be named
 'OSX_InstallESD_[osversion].dmg.'
 
@@ -269,7 +269,7 @@ msg_status "Unmounting ESD.."
 hdiutil detach "$MNT_ESD"
 
 if [ $DMG_OS_VERS_MAJOR -ge 9 ]; then
-	msg_status "On Mavericks the entire modified BaseSystem is our output dmg."
+	msg_status "On Mavericks and later, the entire modified BaseSystem is our output dmg."
 	hdiutil convert -format UDZO -o "$OUTPUT_DMG" "$BASE_SYSTEM_DMG_RW"
 else
 	msg_status "Pre-Mavericks we're modifying the original ESD file."
