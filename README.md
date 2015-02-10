@@ -2,7 +2,13 @@
 
 This is a set of Packer templates and support scripts that will prepare an OS X installer media that performs an unattended install for use with [Packer](http://packer.io) and [VeeWee](http://github.com/jedi4ever/veewee). These were originally developed for VeeWee, but support for the VeeWee template has not been maintained since Packer's release and so it is only provided for historical purposes.
 
-The machine defaults to being configured for use with [Vagrant](http://www.vagrantup.com), using either the [Hashicorp VMware Fusion provider](http://www.vagrantup.com/vmware) or Vagrant's included [VirtualBox provider](http://docs.vagrantup.com/v2/virtualbox/index.html). You can override this, to build a machine with different admin account settings, and without the vagrant ssh keys.
+The machine defaults to being configured for use with [Vagrant](http://www.vagrantup.com), and supports three providers:
+
+- The [Hashicorp VMware Fusion provider](http://www.vagrantup.com/vmware) (recommended)
+- Vagrant's included [VirtualBox provider](http://docs.vagrantup.com/v2/virtualbox/index.html)
+- [Parallels](https://github.com/Parallels/vagrant-parallels)
+
+It's possible to build a machine with different admin account settings, and without the vagrant ssh keys, for use with other systems such as CI.
 
 Use with the Fusion provider requires Vagrant 1.3.0, and use with the VirtualBox provider Vagrant 1.6.3 if using the Rsync file sync mechanism. Note that the VeeWee template also does not have any VirtualBox support.
 
