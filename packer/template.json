@@ -93,6 +93,11 @@
   ],
   "provisioners": [
     {
+      "destination": "/private/tmp/set_kcpassword.py",
+      "source": "../scripts/support/set_kcpassword.py",
+      "type": "file"
+    },
+    {
       "execute_command": "chmod +x {{ .Path }}; sudo {{ .Vars }} {{ .Path }}",
       "scripts": [
         "../scripts/vagrant.sh",
@@ -108,11 +113,6 @@
         "USERNAME={{user `username`}}"
       ],
       "type": "shell"
-    },
-    {
-      "destination": "/private/tmp/set_kcpassword.py",
-      "source": "../scripts/support/set_kcpassword.py",
-      "type": "file"
     },
     {
       "execute_command": "chmod +x {{ .Path }}; sudo {{ .Vars }} {{ .Path }}",
