@@ -107,13 +107,15 @@
         "../scripts/chef-omnibus.sh",
         "../scripts/puppet.sh",
         "../scripts/add-network-interface-detection.sh",
-        "../scripts/autologin.sh"
+        "../scripts/autologin.sh",
+        "../scripts/system-update.sh"
       ],
       "environment_vars": [
         "INSTALL_VAGRANT_KEYS={{user `install_vagrant_keys`}}",
         "USERNAME={{user `username`}}",
         "PASSWORD={{user `password`}}",
-        "AUTOLOGIN={{user `autologin`}}"
+        "AUTOLOGIN={{user `autologin`}}",
+        "UPDATE_SYSTEM={{user `update_system`}}"
       ],
       "type": "shell"
     }
@@ -124,6 +126,7 @@
     "username": "vagrant",
     "password": "vagrant",
     "autologin": false,
-    "install_vagrant_keys": true
+    "install_vagrant_keys": true,
+    "update_system": true
   }
 }
