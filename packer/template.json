@@ -93,6 +93,11 @@
   ],
   "provisioners": [
     {
+      "destination": "/private/tmp/set_kcpassword.py",
+      "source": "../scripts/support/set_kcpassword.py",
+      "type": "file"
+    },
+    {
       "execute_command": "chmod +x {{ .Path }}; sudo {{ .Vars }} {{ .Path }}",
       "scripts": [
         "../scripts/vagrant.sh",
@@ -101,26 +106,16 @@
         "../scripts/xcode-cli-tools.sh",
         "../scripts/chef-omnibus.sh",
         "../scripts/puppet.sh",
-        "../scripts/add-network-interface-detection.sh"
+        "../scripts/add-network-interface-detection.sh",
+        "../scripts/autologin.sh",
+        "../scripts/system-update.sh"
       ],
       "environment_vars": [
         "INSTALL_VAGRANT_KEYS={{user `install_vagrant_keys`}}",
-        "USERNAME={{user `username`}}"
-      ],
-      "type": "shell"
-    },
-    {
-      "destination": "/private/tmp/set_kcpassword.py",
-      "source": "../scripts/support/set_kcpassword.py",
-      "type": "file"
-    },
-    {
-      "execute_command": "chmod +x {{ .Path }}; sudo {{ .Vars }} {{ .Path }}",
-      "inline": [
-        "if [ \"{{user `autologin`}}\" != \"true\" ] && [ \"{{user `autologin`}}\" != \"1\" ]; then exit; fi",
-        "echo \"Enabling automatic GUI login for the '{{user `username`}}' user..\"",
-        "python /private/tmp/set_kcpassword.py \"{{user `password`}}\"",
-        "/usr/bin/defaults write /Library/Preferences/com.apple.loginwindow autoLoginUser \"{{user `username`}}\""
+        "USERNAME={{user `username`}}",
+        "PASSWORD={{user `password`}}",
+        "AUTOLOGIN={{user `autologin`}}",
+        "UPDATE_SYSTEM={{user `update_system`}}"
       ],
       "type": "shell"
     }
@@ -131,6 +126,7 @@
     "username": "vagrant",
     "password": "vagrant",
     "autologin": false,
-    "install_vagrant_keys": true
+    "install_vagrant_keys": true,
+    "update_system": true
   }
 }
