@@ -1,0 +1,5 @@
+# enable autologin
+cp "$3/private/var/tmp/kcpassword" "$3/etc/kcpassword"
+chmod 0600 "$3/etc/kcpassword"
+/usr/bin/defaults write "$3/Library/Preferences/com.apple.loginwindow" autoLoginUser "$USER"
+/bin/chmod 644 "$3/Library/Preferences/com.apple.loginwindow.plist"

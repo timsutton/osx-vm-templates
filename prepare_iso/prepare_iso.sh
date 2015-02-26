@@ -45,6 +45,8 @@ Optional switches:
   -i <path to image>
     Sets the path of the avatar image for the root user, defaulting to the vagrant icon.
 
+  -a
+    Enable auto-login
 EOF
 }
 
@@ -71,8 +73,9 @@ SUPPORT_DIR="$SCRIPT_DIR/support"
 USER="vagrant"
 PASSWORD="vagrant"
 IMAGE_PATH="$SUPPORT_DIR/vagrant.jpg"
+AUTOLOGIN=0
 
-while getopts u:p:i: OPT; do
+while getopts u:p:i:a OPT; do
   case "$OPT" in
     u)
       USER="$OPTARG"
@@ -82,6 +85,9 @@ while getopts u:p:i: OPT; do
       ;;
     i)
       IMAGE_PATH="$OPTARG"
+      ;;
+    a)
+      AUTOLOGIN=1
       ;;
     \?)
       usage
@@ -199,6 +205,13 @@ USER_GUID=$(/usr/libexec/PlistBuddy -c 'Print :generateduid:0' "$SUPPORT_DIR/use
 mkdir -p "$SUPPORT_DIR/tmp/Scripts"
 cat "$SUPPORT_DIR/pkg-postinstall" | sed -e "s/__USER__PLACEHOLDER__/${USER}/" > "$SUPPORT_DIR/tmp/Scripts/postinstall"
 chmod a+x "$SUPPORT_DIR/tmp/Scripts/postinstall"
+if [ $AUTOLOGIN -eq 1 ]; then
+  # create password in /var/tmp
+  mkdir -p "$SUPPORT_DIR/pkgroot/private/var/tmp"
+  python "$SUPPORT_DIR/gen_kcpassword.py" "$PASSWORD" $SUPPORT_DIR/pkgroot/private/var/tmp/kcpassword
+  # append autologin steps to postinstall script
+  cat "$SUPPORT_DIR/autologin" >> "$SUPPORT_DIR/tmp/Scripts/postinstall"
+fi
 
 # build it
 BUILT_COMPONENT_PKG="$SUPPORT_DIR/tmp/veewee-config-component.pkg"
