@@ -29,6 +29,12 @@ echo "$USER ALL=(ALL) NOPASSWD: ALL" >> "$3/etc/sudoers"
 USER_GUID=$($PlistBuddy -c 'Print :generateduid:0' "$target_ds_node/users/$USER.plist")
 USER_UID=$($PlistBuddy -c 'Print :uid:0' "$target_ds_node/users/$USER.plist")
 $PlistBuddy -c 'Add :groupmembers: string '"$USER_GUID" "$target_ds_node/groups/admin.plist"
+# Add user to SSH SACL group membership
+ssh_group="${target_ds_node}/groups/com.apple.access_ssh.plist"
+$PlistBuddy -c 'Add :groupmembers array' "${ssh_group}"
+$PlistBuddy -c 'Add :groupmembers:0 string '"$USER_GUID"'' "${ssh_group}"
+$PlistBuddy -c 'Add :users array' "${ssh_group}"
+$PlistBuddy -c 'Add :users:0 string '$USER'' "${ssh_group}"
 
 # Configure user with full Remote Desktop privileges
 $PlistBuddy -c 'Add :naprivs array' "$target_ds_node/users/$USER.plist"
