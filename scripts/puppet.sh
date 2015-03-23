@@ -67,4 +67,4 @@ install_dmg "Hiera" "${HIERA_DMG}"
 defaults write /Library/Preferences/com.apple.loginwindow Hide500Users -bool YES
 
 # Clean up
-rm -rf "${PUPPET_DMG}" "${FACTER_DMG}" "${HIERA_DMG}" "~/Library/AutoPkg"
+rm -rf "${PUPPET_DMG}" "${FACTER_DMG}" "${HIERA_DMG}" "${AUTOPKG_DIR}" "~/Library/AutoPkg"
