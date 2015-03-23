@@ -40,7 +40,9 @@ get_dmg() {
     # Run AutoPkg setting VERSION, and saving the results as a plist
     "${AUTOPKG}" run --report-plist "${report_path}" -k VERSION="${version}" "${recipe_name}" > \
         "$(mktemp "/tmp/autopkg-runlog-${recipe_name}")"
-    /usr/libexec/PlistBuddy -c 'Print :new_downloads:0' "${report_path}"
+    /usr/libexec/PlistBuddy -c \
+        'Print :summary_results:url_downloader_summary_result:data_rows:0:download_path' \
+        "${report_path}"
 }
 
 # Get AutoPkg
