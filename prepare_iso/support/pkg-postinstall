@@ -3,25 +3,43 @@ USER="__USER__PLACEHOLDER__"
 OSX_VERS=$(sw_vers -productVersion | awk -F "." '{print $2}')
 PlistBuddy="/usr/libexec/PlistBuddy"
 
+target_ds_node="${3}/private/var/db/dslocal/nodes/Default"
 # Override the default behavior of sshd on the target volume to be not disabled
 if [ "$OSX_VERS" -ge 10 ]; then
     OVERRIDES_PLIST="$3/private/var/db/com.apple.xpc.launchd/disabled.plist"
     $PlistBuddy -c 'Delete :com.openssh.sshd' "$OVERRIDES_PLIST"
     $PlistBuddy -c 'Add :com.openssh.sshd bool False' "$OVERRIDES_PLIST"
+    $PlistBuddy -c 'Delete :com.apple.screensharing' "$OVERRIDES_PLIST"
+    $PlistBuddy -c 'Add :com.apple.screensharing bool False' "$OVERRIDES_PLIST"
 else
     OVERRIDES_PLIST="$3/private/var/db/launchd.db/com.apple.launchd/overrides.plist"
     $PlistBuddy -c 'Delete :com.openssh.sshd' "$OVERRIDES_PLIST"
     $PlistBuddy -c 'Add :com.openssh.sshd:Disabled bool False' "$OVERRIDES_PLIST"
+    $PlistBuddy -c 'Delete :com.apple.screensharing' "$OVERRIDES_PLIST"
+    $PlistBuddy -c 'Add :com.apple.screensharing:Disabled bool False' "$OVERRIDES_PLIST"
 fi
+# Placeholder for Remote Management
+echo "enabled" > "$3/private/etc/RemoteManagement.launchd"
 
 # Add user to sudoers
 cp "$3/etc/sudoers" "$3/etc/sudoers.orig"
 echo "$USER ALL=(ALL) NOPASSWD: ALL" >> "$3/etc/sudoers"
 
 # Add user to admin group memberships (even though GID 80 is enough for most things)
-USER_GUID=$($PlistBuddy -c 'Print :generateduid:0' "$3/private/var/db/dslocal/nodes/Default/users/$USER.plist")
-USER_UID=$($PlistBuddy -c 'Print :uid:0' "$3/private/var/db/dslocal/nodes/Default/users/$USER.plist")
-$PlistBuddy -c 'Add :groupmembers: string '"$USER_GUID" "$3/private/var/db/dslocal/nodes/Default/groups/admin.plist"
+USER_GUID=$($PlistBuddy -c 'Print :generateduid:0' "$target_ds_node/users/$USER.plist")
+USER_UID=$($PlistBuddy -c 'Print :uid:0' "$target_ds_node/users/$USER.plist")
+$PlistBuddy -c 'Add :groupmembers: string '"$USER_GUID" "$target_ds_node/groups/admin.plist"
+# Add user to SSH SACL group membership
+ssh_group="${target_ds_node}/groups/com.apple.access_ssh.plist"
+$PlistBuddy -c 'Add :groupmembers array' "${ssh_group}"
+$PlistBuddy -c 'Add :groupmembers:0 string '"$USER_GUID"'' "${ssh_group}"
+$PlistBuddy -c 'Add :users array' "${ssh_group}"
+$PlistBuddy -c 'Add :users:0 string '$USER'' "${ssh_group}"
+
+# Configure user with full Remote Desktop privileges
+$PlistBuddy -c 'Add :naprivs array' "$target_ds_node/users/$USER.plist"
+$PlistBuddy -c 'Add :naprivs:0 integer -1073741569' "$target_ds_node/users/$USER.plist"
+
 
 # Pre-create user folder so veewee will have somewhere to scp configinfo to
 mkdir -p "$3/Users/$USER/Library/Preferences"
