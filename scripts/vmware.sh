@@ -1,15 +1,23 @@
 #!/bin/sh
 
-TOOLS_PATH="/Users/$USERNAME/darwin.iso"
-# VMware Fusion specific items
-if [ -e .vmfusion_version ] || [[ "$PACKER_BUILDER_TYPE" == vmware* ]]; then
-    if [ ! -e "$TOOLS_PATH" ]; then
+# VMware specific items
+if [[ "$PACKER_BUILDER_TYPE" == vmware* ]]; then
+    # VMware Fusion specific items
+    TMPMOUNT=`/usr/bin/mktemp -d /tmp/vmware-tools.XXXX`
+    TOOLS_PATH="/Users/$USERNAME/darwin.iso"
+    if [ -e .vmfusion_version ]; then
+      MOUNT_COMMAND='hdiutil attach'
+      $MOUNT_COMMAND "$DEVICE_PATH" -mountpoint "$TMPMOUNT"
+      if [ ! -e "$TOOLS_PATH" ]; then
         echo "Couldn't locate uploaded tools iso at $TOOLS_PATH!"
         exit 1
+      fi
+    else
+      # TOOLS_PATH=`diskutil list | grep VMware | awk '{ print $(NF)}'`
+      # MOUNT_COMMAND='diskutil mount'
+      TMPMOUNT="/Volumes/VMware Tools"
+      # echo found tools path of $TOOLS_PATH
     fi
-
-    TMPMOUNT=`/usr/bin/mktemp -d /tmp/vmware-tools.XXXX`
-    hdiutil attach "$TOOLS_PATH" -mountpoint "$TMPMOUNT"
 
     INSTALLER_PKG="$TMPMOUNT/Install VMware Tools.app/Contents/Resources/VMware Tools.pkg"
     if [ ! -e "$INSTALLER_PKG" ]; then
@@ -18,15 +26,18 @@ if [ -e .vmfusion_version ] || [[ "$PACKER_BUILDER_TYPE" == vmware* ]]; then
     fi
 
     echo "Installing VMware tools.."
-    installer -pkg "$TMPMOUNT/Install VMware Tools.app/Contents/Resources/VMware Tools.pkg" -target /
+    installer -pkg "$INSTALLER_PKG" -target /
 
-    # This usually fails
-    hdiutil detach "$TMPMOUNT"
-    rm -rf "$TMPMOUNT"
-    rm -f "$TOOLS_PATH"
+    if [ -e .vmfusion_version ]; then
+        # clean up for Fusion
+        # This usually fails
+        hdiutil detach "$TMPMOUNT"
+        rm -rf "$TMPMOUNT"
+        rm -f "$TOOLS_PATH"
 
-    # Point Linux shared folder root to that used by OS X guests,
-    # useful for the Hashicorp vmware_fusion Vagrant provider plugin
-    mkdir /mnt
-    ln -sf /Volumes/VMware\ Shared\ Folders /mnt/hgfs
+        # Point Linux shared folder root to that used by OS X guests,
+        # useful for the Hashicorp vmware_fusion Vagrant provider plugin
+        mkdir /mnt
+        ln -sf /Volumes/VMware\ Shared\ Folders /mnt/hgfs
+    fi
 fi
