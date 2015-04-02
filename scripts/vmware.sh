@@ -13,10 +13,8 @@ if [[ "$PACKER_BUILDER_TYPE" == vmware* ]]; then
         exit 1
       fi
     else
-      # TOOLS_PATH=`diskutil list | grep VMware | awk '{ print $(NF)}'`
-      # MOUNT_COMMAND='diskutil mount'
+      # location of tools when mounted by ESXi
       TMPMOUNT="/Volumes/VMware Tools"
-      # echo found tools path of $TOOLS_PATH
     fi
 
     INSTALLER_PKG="$TMPMOUNT/Install VMware Tools.app/Contents/Resources/VMware Tools.pkg"
