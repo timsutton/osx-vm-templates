@@ -115,7 +115,11 @@
         "USERNAME={{user `username`}}",
         "PASSWORD={{user `password`}}",
         "AUTOLOGIN={{user `autologin`}}",
-        "UPDATE_SYSTEM={{user `update_system`}}"
+        "UPDATE_SYSTEM={{user `update_system`}}",
+        "CHEF_VERSION={{user `chef_version`}}",
+        "PUPPET_VERSION={{user `puppet_version`}}",
+        "FACTER_VERSION={{user `facter_version`}}",
+        "HIERA_VERSION={{user `hiera_version`}}"
       ],
       "type": "shell"
     }
@@ -127,6 +131,10 @@
     "password": "vagrant",
     "autologin": false,
     "install_vagrant_keys": true,
-    "update_system": true
+    "update_system": true,
+    "chef_version": "latest",
+    "puppet_version": "latest",
+    "facter_version": "latest",
+    "hiera_version": "latest"
   }
 }
