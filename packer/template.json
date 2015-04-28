@@ -111,30 +111,30 @@
         "../scripts/system-update.sh"
       ],
       "environment_vars": [
-        "INSTALL_VAGRANT_KEYS={{user `install_vagrant_keys`}}",
-        "USERNAME={{user `username`}}",
-        "PASSWORD={{user `password`}}",
         "AUTOLOGIN={{user `autologin`}}",
-        "UPDATE_SYSTEM={{user `update_system`}}",
         "CHEF_VERSION={{user `chef_version`}}",
-        "PUPPET_VERSION={{user `puppet_version`}}",
         "FACTER_VERSION={{user `facter_version`}}",
-        "HIERA_VERSION={{user `hiera_version`}}"
+        "HIERA_VERSION={{user `hiera_version`}}",
+        "INSTALL_VAGRANT_KEYS={{user `install_vagrant_keys`}}",
+        "PASSWORD={{user `password`}}",
+        "PUPPET_VERSION={{user `puppet_version`}}",
+        "UPDATE_SYSTEM={{user `update_system`}}",
+        "USERNAME={{user `username`}}"
       ],
       "type": "shell"
     }
   ],
   "variables": {
+    "autologin": false,
+    "chef_version": "latest",
+    "facter_version": "latest",
+    "hiera_version": "latest",
+    "install_vagrant_keys": true,
     "iso_checksum": "aff67f81dfbad7afda56c423473d61a6",
     "iso_url": "OSX_InstallESD_10.9.3_13D65.dmg",
-    "username": "vagrant",
     "password": "vagrant",
-    "autologin": false,
-    "install_vagrant_keys": true,
-    "update_system": true,
-    "chef_version": "latest",
     "puppet_version": "latest",
-    "facter_version": "latest",
-    "hiera_version": "latest"
+    "update_system": true,
+    "username": "vagrant"
   }
 }
