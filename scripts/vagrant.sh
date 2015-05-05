@@ -21,5 +21,3 @@ fi
 # Create a group and assign the user to it
 dseditgroup -q -o create "$USERNAME"
 dseditgroup -q -o edit -a "$USERNAME" "$USERNAME"
-
-exit
