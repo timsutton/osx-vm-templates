@@ -10,14 +10,14 @@ The machine defaults to being configured for use with [Vagrant](http://www.vagra
 
 It's possible to build a machine with different admin account settings, and without the vagrant ssh keys, for use with other systems such as CI.
 
-Use with the Fusion provider requires Vagrant 1.3.0, and use with the VirtualBox provider Vagrant 1.6.3 if using the Rsync file sync mechanism. Note that the VeeWee template also does not have any VirtualBox support.
+Use with the Fusion provider requires Vagrant 1.3.0, and use with the VirtualBox provider Vagrant 1.6.3 if using the Rsync file sync mechanism. Note that the VeeWee template also does not have any VirtualBox or Parallels support.
 
 Provisioning steps that are defined in the template via items in the [scripts](https://github.com/timsutton/osx-vm-templates/tree/master/scripts) directory:
 - [Vagrant-specific configuration](http://docs.vagrantup.com/v2/boxes/base.html)
 - VM guest tools installation if on VMware
 - Xcode CLI tools installation
 - Chef installation via the [Chef client installer for OS X](https://www.getchef.com/download-chef-client)
-- Puppet installation via [AutoPkg](https://github.com/autopkg/autopkg) [recipes](https://github.com/autopkg/recipes/tree/master/Puppetlabs)
+- Puppet installation via [Puppetlabs Mac installers](https://downloads.puppetlabs.com/mac)
 
 
 ## Preparing the ISO
