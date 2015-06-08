@@ -123,23 +123,36 @@
         "../scripts/puppet.sh",
         "../scripts/add-network-interface-detection.sh",
         "../scripts/autologin.sh",
-        "../scripts/system-update.sh"
+        "../scripts/system-update.sh",
+        "../scripts/shrink.sh"
       ],
       "environment_vars": [
+        "AUTOLOGIN={{user `autologin`}}",
+        "CHEF_VERSION={{user `chef_version`}}",
+        "FACTER_VERSION={{user `facter_version`}}",
+        "HIERA_VERSION={{user `hiera_version`}}",
         "INSTALL_VAGRANT_KEYS={{user `install_vagrant_keys`}}",
-        "USERNAME={{user `username`}}",
         "PASSWORD={{user `password`}}",
-        "UPDATE_SYSTEM={{user `update_system`}}"
+        "PUPPET_VERSION={{user `puppet_version`}}",
+        "UPDATE_SYSTEM={{user `update_system`}}",
+        "USERNAME={{user `username`}}"
       ],
       "type": "shell"
     }
   ],
   "variables": {
     "iso_checksum": "98a4d47c676c8a8e8ee802a136dd6b80",
+    "autologin": false,
+    "chef_version": "latest",
+    "facter_version": "latest",
+    "hiera_version": "latest",
+    "install_vagrant_keys": true,
+    "iso_checksum": "aff67f81dfbad7afda56c423473d61a6",
     "iso_url": "OSX_InstallESD_10.9.3_13D65.dmg",
-    "username": "vagrant",
     "password": "vagrant",
     "install_vagrant_keys": true,
     "update_system": true
+    "puppet_version": "latest",
+    "username": "vagrant"
   }
 }

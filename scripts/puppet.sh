@@ -1,22 +1,17 @@
 #!/bin/sh
 
-# Install the latest Puppet and Facter using AutoPkg recipes
-# https://github.com/autopkg/autopkg
+# Install the specified version of Puppet and tools
 #
-# PUPPET_VERSION, FACTER_VERSION and HIERA_VERSION can be overridden with specific versions,
-# or "latest" to get the latest stable versions
-
-PUPPET_VERSION=${PUPPET_VERSION:-latest}
-FACTER_VERSION=${FACTER_VERSION:-latest}
-HIERA_VERSION=${HIERA_VERSION:-latest}
-
+# PUPPET_VERSION, FACTER_VERSION and HIERA_VERSION are set to either
+# 'latest' or specific versions via the Packer template
+#
 # install function mostly borrowed dmg function from hashicorp/puppet-bootstrap,
 # except we just take an already-downloaded dmg
-function install_dmg() {
-    local name="$1"
-    local dmg_path="$2"
 
-    echo "Installing: ${name}"
+install_dmg() {
+    local dmg_path="$1"
+
+    echo "Installing: ${dmg_path}"
 
     # Mount the DMG
     echo "-- Mounting DMG..."
@@ -32,39 +27,26 @@ function install_dmg() {
     hdiutil eject "${tmpmount}"
 }
 
-function get_dmg() {
-    local recipe_name="$1"
+get_dmg() {
+    local name="$1"
     local version="$2"
-    local report_path=$(mktemp /tmp/autopkg-report-XXXX)
-
-    # Run AutoPkg setting VERSION, and saving the results as a plist
-    "${AUTOPKG}" run --report-plist ${report_path} -k VERSION="${version}" ${recipe_name} > \
-        $(mktemp "/tmp/autopkg-runlog-${recipe_name}")
-    echo $(/usr/libexec/PlistBuddy -c 'Print :new_downloads:0' ${report_path})
+    curl -s -O "https://downloads.puppetlabs.com/mac/${name}-${version}.dmg"
+    echo "${name}-${version}.dmg"
 }
 
-# Get AutoPkg
-AUTOPKG_DIR=$(mktemp -d /tmp/autopkg-XXXX)
-git clone https://github.com/autopkg/autopkg "$AUTOPKG_DIR"
-AUTOPKG="$AUTOPKG_DIR/Code/autopkg"
 
-# Add the recipes repo containing Puppet/Facter
-"${AUTOPKG}" repo-add recipes
-
-# Redirect AutoPkg cache to a temp location
-defaults write com.github.autopkg CACHE_DIR -string "$(mktemp -d /tmp/autopkg-cache-XXX)"
 # Retrieve the installer DMGs
-PUPPET_DMG=$(get_dmg Puppet.download "${PUPPET_VERSION}")
-FACTER_DMG=$(get_dmg Facter.download "${FACTER_VERSION}")
-HIERA_DMG=$(get_dmg Hiera.download "${HIERA_VERSION}")
+PUPPET_DMG=$(get_dmg puppet "${PUPPET_VERSION}")
+FACTER_DMG=$(get_dmg facter "${FACTER_VERSION}")
+HIERA_DMG=$(get_dmg hiera "${HIERA_VERSION}")
 
 # Install them
-install_dmg "Puppet" "${PUPPET_DMG}"
-install_dmg "Facter" "${FACTER_DMG}"
-install_dmg "Hiera" "${HIERA_DMG}"
+install_dmg "${PUPPET_DMG}"
+install_dmg "${FACTER_DMG}"
+install_dmg "${HIERA_DMG}"
 
 # Hide all users from the loginwindow with uid below 500, which will include the puppet user
 defaults write /Library/Preferences/com.apple.loginwindow Hide500Users -bool YES
 
 # Clean up
-rm -rf "${PUPPET_DMG}" "${FACTER_DMG}" "${HIERA_DMG}" "~/Library/AutoPkg"
+rm -rf "${PUPPET_DMG}" "${FACTER_DMG}" "${HIERA_DMG}"
