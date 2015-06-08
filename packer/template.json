@@ -29,8 +29,8 @@
       ]
     },
     {
-      "boot_wait": "2s",
-      "disk_size": 20480,
+      "boot_wait": "10s",
+      "disk_size": 80480,
       "guest_os_type": "darwin12-64",
       "iso_checksum_type": "md5",
       "iso_checksum": "{{user `iso_checksum`}}",
@@ -43,18 +43,29 @@
       "ssh_wait_timeout": "10000s",
       "tools_upload_flavor": "darwin",
       "type": "vmware-iso",
+      "output_directory": "aspera-packer",
       "vmx_data": {
-        "cpuid.coresPerSocket": "1",
-        "memsize": "2048",
-        "numvcpus": "1",
+        "cpuid.coresPerSocket": "2",
+        "memsize": "4096",
+        "numvcpus": "2",
         "firmware": "efi",
         "keyboardAndMouseProfile": "macProfile",
         "smc.present": "TRUE",
         "hpet0.present": "TRUE",
         "ich7m.present": "TRUE",
         "ehci.present": "TRUE",
-        "usb.present": "TRUE"
-      }
+        "usb.present": "TRUE",
+        "ethernet0.present": "TRUE",
+        "ethernet0.startConnected": "TRUE",
+        "ethernet0.virtualDev": "e1000",
+        "ethernet0.networkName": "VM Network",
+        "ethernet0.addressType": "generated"
+      },
+      "remote_type": "esx5",
+      "remote_host": "10.0.14.101",
+      "remote_datastore": "local_14-101_d2", 
+      "remote_username": "admin",
+      "remote_password": "Pate1P1D6x_"
     },
     {
       "boot_wait": "2s",
@@ -89,14 +100,18 @@
   ],
   "min_packer_version": "0.7.0",
   "post-processors": [
-    "vagrant"
+    {
+      "output": "../builds/{{.Provider}}/aspera_macosx_10_9_chef-{{user `chef_version`}}.box",
+      "override": {
+        "parallels": {
+          "vagrantfile_template": "vagrantfile_templates/parallels/freebsd.rb"
+        }
+      },
+      "type": "vagrant",
+      "except": ["vmware-iso"]
+    }
   ],
   "provisioners": [
-    {
-      "destination": "/private/tmp/set_kcpassword.py",
-      "source": "../scripts/support/set_kcpassword.py",
-      "type": "file"
-    },
     {
       "execute_command": "chmod +x {{ .Path }}; sudo {{ .Vars }} {{ .Path }}",
       "scripts": [
@@ -114,18 +129,16 @@
         "INSTALL_VAGRANT_KEYS={{user `install_vagrant_keys`}}",
         "USERNAME={{user `username`}}",
         "PASSWORD={{user `password`}}",
-        "AUTOLOGIN={{user `autologin`}}",
         "UPDATE_SYSTEM={{user `update_system`}}"
       ],
       "type": "shell"
     }
   ],
   "variables": {
-    "iso_checksum": "aff67f81dfbad7afda56c423473d61a6",
+    "iso_checksum": "98a4d47c676c8a8e8ee802a136dd6b80",
     "iso_url": "OSX_InstallESD_10.9.3_13D65.dmg",
     "username": "vagrant",
     "password": "vagrant",
-    "autologin": false,
     "install_vagrant_keys": true,
     "update_system": true
   }
