@@ -97,7 +97,7 @@ More details as to the modifications to the installer media are provided in the 
 
 ## Supported guest OS versions
 
-Currently this prepare script and template supports OS X Lion (10.7) through Yosemite (10.10).
+Currently this prepare script and template supports all versions of OS X that are distributed through the App Store: OS X Lion (10.7) through Yosemite (10.10), and currently the El Capitan Betas (10.11).
 
 
 ## Automated GUI logins
