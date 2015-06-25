@@ -50,3 +50,9 @@ defaults write /Library/Preferences/com.apple.loginwindow Hide500Users -bool YES
 
 # Clean up
 rm -rf "${PUPPET_DMG}" "${FACTER_DMG}" "${HIERA_DMG}"
+OSX_VERS=$(sw_vers -productVersion | awk -F "." '{print $2}')
+
+if [ "$OSX_VERS" = "11" ]; then
+    nvram -d boot-args
+    reboot
+fi
