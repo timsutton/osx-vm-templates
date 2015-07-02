@@ -126,16 +126,16 @@
     }
   ],
   "variables": {
-    "autologin": false,
+    "autologin": "false",
     "chef_version": "latest",
     "facter_version": "latest",
     "hiera_version": "latest",
-    "install_vagrant_keys": true,
+    "install_vagrant_keys": "true",
     "iso_checksum": "aff67f81dfbad7afda56c423473d61a6",
     "iso_url": "OSX_InstallESD_10.9.3_13D65.dmg",
     "password": "vagrant",
     "puppet_version": "latest",
-    "update_system": true,
+    "update_system": "true",
     "username": "vagrant"
   }
 }
