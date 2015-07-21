@@ -38,7 +38,7 @@ $PlistBuddy -c 'Add :users:0 string '$USER'' "${ssh_group}"
 
 # Configure user with full Remote Desktop privileges
 $PlistBuddy -c 'Add :naprivs array' "$target_ds_node/users/$USER.plist"
-$PlistBuddy -c 'Add :naprivs:0 integer -1073741569' "$target_ds_node/users/$USER.plist"
+$PlistBuddy -c 'Add :naprivs:0 string -1073741569' "$target_ds_node/users/$USER.plist"
 
 
 # Pre-create user folder so veewee will have somewhere to scp configinfo to
