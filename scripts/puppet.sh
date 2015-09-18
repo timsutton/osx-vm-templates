@@ -9,9 +9,10 @@
 # except we just take an already-downloaded dmg
 
 install_dmg() {
-    local dmg_path="$1"
+    local name="$1"
+    local dmg_path="$2"
 
-    echo "Installing: ${dmg_path}"
+    echo "Installing: ${name}"
 
     # Mount the DMG
     echo "-- Mounting DMG..."
@@ -28,30 +29,50 @@ install_dmg() {
 }
 
 get_dmg() {
-    local name="$1"
+    local recipe_name="$1"
     local version="$2"
-    curl -s -O "https://downloads.puppetlabs.com/mac/${name}-${version}.dmg"
-    echo "${name}-${version}.dmg"
+    local report_path=$(mktemp /tmp/autopkg-report-XXXX)
+
+    # Run AutoPkg setting VERSION, and saving the results as a plist
+    "${AUTOPKG}" run --report-plist "${report_path}" -k VERSION="${version}" "${recipe_name}" > \
+        "$(mktemp "/tmp/autopkg-runlog-${recipe_name}")"
+    /usr/libexec/PlistBuddy -c \
+        'Print :summary_results:url_downloader_summary_result:data_rows:0:download_path' \
+        "${report_path}"
 }
 
+PUPPET_VERSION=${PUPPET_VERSION:-latest}
+FACTER_VERSION=${FACTER_VERSION:-latest}
+HIERA_VERSION=${HIERA_VERSION:-latest}
 
+# Get AutoPkg
+AUTOPKG_DIR=$(mktemp -d /tmp/autopkg-XXXX)
+git clone https://github.com/autopkg/autopkg "$AUTOPKG_DIR"
+AUTOPKG="$AUTOPKG_DIR/Code/autopkg"
+
+# Add the recipes repo containing Puppet/Facter
+"${AUTOPKG}" repo-add recipes
+
+# Redirect AutoPkg cache to a temp location
+defaults write com.github.autopkg CACHE_DIR -string "$(mktemp -d /tmp/autopkg-cache-XXX)"
 # Retrieve the installer DMGs
-PUPPET_DMG=$(get_dmg puppet "${PUPPET_VERSION}")
-FACTER_DMG=$(get_dmg facter "${FACTER_VERSION}")
-HIERA_DMG=$(get_dmg hiera "${HIERA_VERSION}")
+PUPPET_DMG=$(get_dmg Puppet.download "${PUPPET_VERSION}")
+FACTER_DMG=$(get_dmg Facter.download "${FACTER_VERSION}")
+HIERA_DMG=$(get_dmg Hiera.download "${HIERA_VERSION}")
 
 # Install them
-install_dmg "${PUPPET_DMG}"
-install_dmg "${FACTER_DMG}"
-install_dmg "${HIERA_DMG}"
+install_dmg "Puppet" "${PUPPET_DMG}"
+install_dmg "Facter" "${FACTER_DMG}"
+install_dmg "Hiera" "${HIERA_DMG}"
 
 # Hide all users from the loginwindow with uid below 500, which will include the puppet user
 defaults write /Library/Preferences/com.apple.loginwindow Hide500Users -bool YES
 
 # Clean up
-rm -rf "${PUPPET_DMG}" "${FACTER_DMG}" "${HIERA_DMG}"
-OSX_VERS=$(sw_vers -productVersion | awk -F "." '{print $2}')
+rm -rf "${PUPPET_DMG}" "${FACTER_DMG}" "${HIERA_DMG}" "${AUTOPKG_DIR}" "~/Library/AutoPkg"
 
+# DP1 SIP handling
+OSX_VERS=$(sw_vers -productVersion | awk -F "." '{print $2}')
 if [ "$OSX_VERS" = "11" ]; then
     nvram -d boot-args
     reboot
