@@ -19,6 +19,9 @@ Provisioning steps that are defined in the template via items in the [scripts](h
 - Chef installation via the [Chef client installer for OS X](https://www.getchef.com/download-chef-client)
 - Puppet installation via [Puppetlabs Mac installers](https://downloads.puppetlabs.com/mac)
 
+## Supported guest OS versions
+
+Currently this prepare script and template supports all versions of OS X that are distributed through the App Store: OS X Lion (10.7) through Yosemite (10.10). El Capitan (10.11) worked in the early Developer Previews but currently does not work - the DMG that is output will not boot in the VM.
 
 ## Preparing the ISO
 
@@ -48,10 +51,6 @@ For example:
 #### Clone this repository
 
 The `prepare_iso.sh` script needs the `support` directory and its content. In other words, the easiest way to run the script is after cloning this repository.
-
-#### Snow Leopard
-
-The `prepare_iso.sh` script depends on `pkgbuild` utility. As `pkgbuild` is not installed on Snow Leopard (contrary to the later OS X), you need to install XCode 3.2.6 which includes it.
 
 ## Use with Packer
 
@@ -93,11 +92,6 @@ OS X's installer supports a kind of bootstrap install functionality similar to L
 The `prepare_iso.sh` script in this repo takes care of mounting and modifying a vanilla OS X installer downloaded from the Mac App Store. The resulting .dmg file and checksum can then be added to the Packer template. Because the preparation is done up front, no boot command sequences, attached devices or web server access is required.
 
 More details as to the modifications to the installer media are provided in the comments of the script.
-
-
-## Supported guest OS versions
-
-Currently this prepare script and template supports all versions of OS X that are distributed through the App Store: OS X Lion (10.7) through Yosemite (10.10), and currently the El Capitan Betas (10.11).
 
 
 ## Automated GUI logins
@@ -152,4 +146,4 @@ A built box with CLI tools, Puppet and Chef is over 5GB in size. It might be adv
 
 ## Alternate approaches to VM provisioning
 
-Mads Fog Albrechtslund documents an [interesting method](http://hazenet.dk/2013/07/17/creating-a-never-booted-os-x-template-in-vsphere-5-1) for converting unbooted .dmg images into VMDK files for use with ESXi.
+Joe Chilcote has written a tool, [vfuse](https://github.com/chilcote/vfuse), which converts a never-booted OS X image (such as created with a tool like [AutoDMG](https://github.com/MagerValp/AutoDMG)) into a VMDK and configures a VMware Fusion VM. vfuse can also configure a Packer template alongside the VM, configured with the `vmware-vmx` builder.
