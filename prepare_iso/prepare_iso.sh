@@ -295,7 +295,12 @@ fi
 
 msg_status "Adding automated components.."
 CDROM_LOCAL="$MNT_BASE_SYSTEM/private/etc/rc.cdrom.local"
-echo "diskutil eraseDisk jhfs+ \"Macintosh HD\" GPTFormat disk0" > "$CDROM_LOCAL"
+cat > $CDROM_LOCAL << EOF
+diskutil eraseDisk jhfs+ "Macintosh HD" GPTFormat disk0
+if [ "\$?" == "1" ]; then
+    diskutil eraseDisk jhfs+ "Macintosh HD" GPTFormat disk1
+fi
+EOF
 chmod a+x "$CDROM_LOCAL"
 mkdir "$PACKAGES_DIR/Extras"
 cp "$SUPPORT_DIR/minstallconfig.xml" "$PACKAGES_DIR/Extras/"
