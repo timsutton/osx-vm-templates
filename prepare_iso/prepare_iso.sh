@@ -219,17 +219,17 @@ hdiutil detach "$MNT_BASE_SYSTEM"
 
 BASE_SYSTEM_DMG_RW="$(/usr/bin/mktemp /tmp/veewee-osx-basesystem-rw.XXXX).dmg"
 
-msg_status "Converting BaseSystem.dmg to a read-write DMG located at $BASE_SYSTEM_DMG_RW.."
-# hdiutil convert -o will actually append .dmg to the filename if it has no extn
-hdiutil convert -format UDRW -o "$BASE_SYSTEM_DMG_RW" "$BASE_SYSTEM_DMG"
-
-if [ $DMG_OS_VERS_MAJOR -ge 9 ]; then
-	msg_status "Growing new BaseSystem.."
-	hdiutil resize -size 7G "$BASE_SYSTEM_DMG_RW"
-fi
-
-msg_status "Mounting new BaseSystem.."
+msg_status "Creating empty read-write DMG located at $BASE_SYSTEM_DMG_RW.."
+hdiutil create -o "$BASE_SYSTEM_DMG_RW" -size 10g -layout SPUD -fs HFS+J
 hdiutil attach "$BASE_SYSTEM_DMG_RW" -mountpoint "$MNT_BASE_SYSTEM" -nobrowse -owners on
+
+msg_status "Copying BaseSystem to read-write DMG.."
+asr restore -source "$BASE_SYSTEM_DMG" -target "$MNT_BASE_SYSTEM" -noprompt -noverify -erase
+
+# FIXME: asr mounts image under a different name. So unmount and remount.
+umount /Volumes/OS\ X\ Base\ System/
+hdiutil attach "$BASE_SYSTEM_DMG_RW" -mountpoint "$MNT_BASE_SYSTEM" -nobrowse -owners on
+
 if [ $DMG_OS_VERS_MAJOR -ge 9 ]; then
 	rm "$MNT_BASE_SYSTEM/System/Installation/Packages"
 	msg_status "Moving 'Packages' directory from the ESD to BaseSystem.."
