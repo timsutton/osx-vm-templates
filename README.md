@@ -21,7 +21,7 @@ Provisioning steps that are defined in the template via items in the [scripts](h
 
 ## Supported guest OS versions
 
-Currently this prepare script and template supports all versions of OS X that are distributed through the App Store: OS X Lion (10.7) through Yosemite (10.10). El Capitan (10.11) worked in the early Developer Previews but currently does not work - the DMG that is output will not boot in the VM.
+Currently this prepare script and template supports all versions of OS X that are distributed through the App Store: OS X Lion (10.7) through El Capitan (10.11).
 
 ## Preparing the ISO
 
