@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -e
 #
 # Preparation script for an OS X automated installation for use with VeeWee/Packer/Vagrant
 # 
@@ -51,6 +51,15 @@ Optional switches:
 
 EOF
 }
+
+cleanup() {
+    hdiutil detach -quiet -force "$MNT_ESD" || echo > /dev/null
+    hdiutil detach -quiet -force "$MNT_BASE_SYSTEM" || echo > /dev/null
+    rm -rf "$MNT_ESD" "$MNT_BASE_SYSTEM" "$BASE_SYSTEM_DMG_RW" "$SHADOW_FILE"
+}
+
+trap cleanup EXIT INT TERM
+
 
 msg_status() {
 	echo "\033[0;32m-- $1\033[0m"
