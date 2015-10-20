@@ -1,14 +1,14 @@
 # OS X templates for Packer and VeeWee
 
-This is a set of Packer templates and support scripts that will prepare an OS X installer media that performs an unattended install for use with [Packer](http://packer.io) and [VeeWee](http://github.com/jedi4ever/veewee). These were originally developed for VeeWee, but support for the VeeWee template has not been maintained since Packer's release and so it is only provided for historical purposes.
+This is a set of Packer templates and support scripts that will prepare an OS X installer media that performs an unattended install for use with [Packer](http://packer.io) and [VeeWee](http://github.com/jedi4ever/veewee). These were originally developed for VeeWee, but support for the VeeWee template has not been maintained since Packer's release and so it is only provided for historical purposes. I plan on removing VeeWee support from this repo soon, but VeeWee can still make use of the preparation script and the [OS X template](https://github.com/jedi4ever/veewee/tree/master/templates/OSX) remains in the core VeeWee repo.
 
-The machine defaults to being configured for use with [Vagrant](http://www.vagrantup.com), and supports three providers:
+The machine built by this Packer template defaults to being configured for use with [Vagrant](http://www.vagrantup.com), and supports three Vagrant providers by using Packer's respective builders:
 
 - The [Hashicorp VMware Fusion provider](http://www.vagrantup.com/vmware) (recommended)
 - Vagrant's included [VirtualBox provider](http://docs.vagrantup.com/v2/virtualbox/index.html)
 - [Parallels](https://github.com/Parallels/vagrant-parallels)
 
-It's possible to build a machine with different admin account settings, and without the vagrant ssh keys, for use with other systems such as CI.
+It's possible to build a machine with different admin account settings, and without the vagrant ssh keys, for use with other systems, e.g. continuous integration.
 
 Use with the Fusion provider requires Vagrant 1.3.0, and use with the VirtualBox provider Vagrant 1.6.3 if using the Rsync file sync mechanism. Note that the VeeWee template also does not have any VirtualBox or Parallels support.
 
