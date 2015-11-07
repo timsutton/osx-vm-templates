@@ -236,7 +236,7 @@ msg_status "Creating empty read-write DMG located at $BASE_SYSTEM_DMG_RW.."
 hdiutil create -o "$BASE_SYSTEM_DMG_RW" -size 10g -layout SPUD -fs HFS+J
 hdiutil attach "$BASE_SYSTEM_DMG_RW" -mountpoint "$MNT_BASE_SYSTEM" -nobrowse -owners on
 
-msg_status "Restoring (`asr restore`) the BaseSystem to the read-write DMG.."
+msg_status "Restoring ('asr restore') the BaseSystem to the read-write DMG.."
 # This asr restore was needed as of 10.11 DP7 and up. See
 # https://github.com/timsutton/osx-vm-templates/issues/40
 #
