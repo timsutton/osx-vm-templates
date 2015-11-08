@@ -9,17 +9,23 @@ if [ "$OSX_VERS" -ge 10 ]; then
     OVERRIDES_PLIST="$3/private/var/db/com.apple.xpc.launchd/disabled.plist"
     $PlistBuddy -c 'Delete :com.openssh.sshd' "$OVERRIDES_PLIST"
     $PlistBuddy -c 'Add :com.openssh.sshd bool False' "$OVERRIDES_PLIST"
-    $PlistBuddy -c 'Delete :com.apple.screensharing' "$OVERRIDES_PLIST"
-    $PlistBuddy -c 'Add :com.apple.screensharing bool False' "$OVERRIDES_PLIST"
+    if [ __DISABLE_SCREEN_SHARING__ = 0 ]; then
+        $PlistBuddy -c 'Delete :com.apple.screensharing' "$OVERRIDES_PLIST"
+        $PlistBuddy -c 'Add :com.apple.screensharing bool False' "$OVERRIDES_PLIST"
+    fi
 else
     OVERRIDES_PLIST="$3/private/var/db/launchd.db/com.apple.launchd/overrides.plist"
     $PlistBuddy -c 'Delete :com.openssh.sshd' "$OVERRIDES_PLIST"
     $PlistBuddy -c 'Add :com.openssh.sshd:Disabled bool False' "$OVERRIDES_PLIST"
-    $PlistBuddy -c 'Delete :com.apple.screensharing' "$OVERRIDES_PLIST"
-    $PlistBuddy -c 'Add :com.apple.screensharing:Disabled bool False' "$OVERRIDES_PLIST"
+    if [ __DISABLE_SCREEN_SHARING__ = 0 ]; then
+        $PlistBuddy -c 'Delete :com.apple.screensharing' "$OVERRIDES_PLIST"
+        $PlistBuddy -c 'Add :com.apple.screensharing:Disabled bool False' "$OVERRIDES_PLIST"
+    fi
 fi
 # Placeholder for Remote Management
-echo "enabled" > "$3/private/etc/RemoteManagement.launchd"
+if [ __DISABLE_REMOTE_MANAGEMENT__ = 0 ]; then
+    echo "enabled" > "$3/private/etc/RemoteManagement.launchd"
+fi
 
 # Add user to sudoers
 cp "$3/etc/sudoers" "$3/etc/sudoers.orig"
