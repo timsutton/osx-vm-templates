@@ -118,6 +118,16 @@ VirtualBox support is thanks entirely to contributions by [Matt Behrens (@zigg)]
 
 ### Caveats
 
+#### Extension Pack
+
+The VirtualBox Extension Pack, availble from the [Download VirtualBox](https://www.virtualbox.org/wiki/Downloads) page, is now required by default because we enable EHCI (USB 2.0) support like the default VirtualBox OS X template does.
+
+If you cannot use the Extension Pack, you can remove the line that enables EHCI support from [`packer/template.json`](https://github.com/timsutton/osx-vm-templates/blob/master/packer/template.json):
+
+```
+        ["modifyvm", "{{.Name}}", "--usbehci", "on"],
+```
+
 #### Shared folders
 
 Oracle's support for OS X in VirtualBox is very limited, including the lack of guest tools to provide a shared folder mechanism. If using the VirtualBox provider in Vagrant, you will need to configure the shared folder that's set up by default (current folder mapped to `/vagrant`) to use either the `rsync` or `nfs` synced folder mechanisms. You can do this like any other synced folder config in your Vagrantfile:
