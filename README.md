@@ -130,16 +130,6 @@ Vagrant.configure("2") do |config|
 end
 ```
 
-#### Additional VM configuration for Packer
-
-So far we've seen that the `--cpuidset` option needs to be passed to `modifyvm` as a line in the packer template if a Haswell Intel Mac is used to build the VM, at least as of VirtualBox 4.3.12. It seems to cause a VM crash on at least one older Mac, a Core 2 Duo-based 2010 Mac Mini, though did not cause issues on an Ivy Bridge 2013 iMac I tested. If it's missing on a Haswell Mac, however, the VM hangs indefinitely. This behaviour is likely to change over time as Oracle keeps up with support for OS X guests.
-
-```json
-      "vboxmanage": [
-        ["modifyvm", "{{.Name}}", "--cpuidset", "00000001", "000306a9", "00020800", "80000201", "178bfbff"],
-      ]
-```
-
 
 ## Box sizes
 
