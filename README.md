@@ -130,7 +130,17 @@ VirtualBox support is thanks entirely to contributions by [Matt Behrens (@zigg)]
 The default `prepare_iso.sh` configuration enables Remote Management during installation, which causes the resulting virtual machine to [periodically freeze](https://github.com/timsutton/osx-vm-templates/issues/43). You can avoid enabling Remote Management when using `prepare_iso.sh` by passing `-D DISABLE_REMOTE_MANAGEMENT` this:
 
 ```
-sudo prepare_iso -D DISABLE_REMOTE_MANAGEMENT "/Applications/Install OS X El Capitan.app" out
+sudo ./prepare_iso/prepare_iso.sh -D DISABLE_REMOTE_MANAGEMENT "/Applications/Install OS X El Capitan.app" out
+```
+
+#### Extension Pack
+
+The VirtualBox Extension Pack, available from the [Download VirtualBox](https://www.virtualbox.org/wiki/Downloads) page or as the [Homebrew cask](http://caskroom.io/) [virtualbox-extension-pack](https://github.com/caskroom/homebrew-cask/blob/master/Casks/virtualbox-extension-pack.rb), is now required by default because we enable EHCI (USB 2.0) support like the default VirtualBox OS X template does.
+
+If you cannot use the Extension Pack, you can remove the line that enables EHCI support from [`packer/template.json`](https://github.com/timsutton/osx-vm-templates/blob/master/packer/template.json):
+
+```
+        ["modifyvm", "{{.Name}}", "--usbehci", "on"],
 ```
 
 #### Shared folders
