@@ -31,8 +31,8 @@
 usage() {
 	cat <<EOF
 Usage:
-$(basename "$0") [-upi] "/path/to/InstallESD.dmg" /path/to/output/directory
-$(basename "$0") [-upi] "/path/to/Install OS X [Name].app" /path/to/output/directory
+$(basename "$0") [-upiD] "/path/to/InstallESD.dmg" /path/to/output/directory
+$(basename "$0") [-upiD] "/path/to/Install OS X [Name].app" /path/to/output/directory
 
 Description:
 Converts an OS X installer to a new image that contains components
@@ -48,6 +48,11 @@ Optional switches:
 
   -i <path to image>
     Sets the path of the avatar image for the root user, defaulting to the vagrant icon.
+
+  -D <flag>
+    Sets the specified flag. Valid flags are:
+      DISABLE_REMOTE_MANAGEMENT
+      DISABLE_SCREEN_SHARING
 
 EOF
 }
@@ -85,7 +90,11 @@ USER="vagrant"
 PASSWORD="vagrant"
 IMAGE_PATH="$SUPPORT_DIR/vagrant.jpg"
 
-while getopts u:p:i: OPT; do
+# Flags
+DISABLE_REMOTE_MANAGEMENT=0
+DISABLE_SCREEN_SHARING=0
+
+while getopts u:p:i:D: OPT; do
   case "$OPT" in
     u)
       USER="$OPTARG"
@@ -95,6 +104,15 @@ while getopts u:p:i: OPT; do
       ;;
     i)
       IMAGE_PATH="$OPTARG"
+      ;;
+    D)
+      if [ x${!OPTARG} = x0 ]; then
+        eval $OPTARG=1
+      elif [ x${!OPTARG} != x1 ]; then
+        msg_error "Unknown flag: ${OPTARG}"
+        usage
+        exit 1
+      fi
       ;;
     \?)
       usage
@@ -210,7 +228,11 @@ USER_GUID=$(/usr/libexec/PlistBuddy -c 'Print :generateduid:0' "$SUPPORT_DIR/use
 
 # postinstall script
 mkdir -p "$SUPPORT_DIR/tmp/Scripts"
-cat "$SUPPORT_DIR/pkg-postinstall" | sed -e "s/__USER__PLACEHOLDER__/${USER}/" > "$SUPPORT_DIR/tmp/Scripts/postinstall"
+cat "$SUPPORT_DIR/pkg-postinstall" \
+    | sed -e "s/__USER__PLACEHOLDER__/${USER}/" \
+    | sed -e "s/__DISABLE_REMOTE_MANAGEMENT__/${DISABLE_REMOTE_MANAGEMENT}/" \
+    | sed -e "s/__DISABLE_SCREEN_SHARING__/${DISABLE_SCREEN_SHARING}/" \
+    > "$SUPPORT_DIR/tmp/Scripts/postinstall"
 chmod a+x "$SUPPORT_DIR/tmp/Scripts/postinstall"
 
 # build it
