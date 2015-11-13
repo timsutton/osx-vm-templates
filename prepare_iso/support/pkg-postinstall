@@ -46,6 +46,10 @@ if [ __DISABLE_REMOTE_MANAGEMENT__ = 0 ]; then
     $PlistBuddy -c 'Add :naprivs:0 string -1073741569' "$target_ds_node/users/$USER.plist"
 fi
 
+if [ __DISABLE_SIP__ = 1 ]; then
+    csrutil disable
+fi
+
 # Pre-create user folder so veewee will have somewhere to scp configinfo to
 mkdir -p "$3/Users/$USER/Library/Preferences"
 

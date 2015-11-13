@@ -53,6 +53,7 @@ Optional switches:
     Sets the specified flag. Valid flags are:
       DISABLE_REMOTE_MANAGEMENT
       DISABLE_SCREEN_SHARING
+      DISABLE_SIP
 
 EOF
 }
@@ -93,6 +94,7 @@ IMAGE_PATH="$SUPPORT_DIR/vagrant.jpg"
 # Flags
 DISABLE_REMOTE_MANAGEMENT=0
 DISABLE_SCREEN_SHARING=0
+DISABLE_SIP=0
 
 while getopts u:p:i:D: OPT; do
   case "$OPT" in
@@ -232,6 +234,7 @@ cat "$SUPPORT_DIR/pkg-postinstall" \
     | sed -e "s/__USER__PLACEHOLDER__/${USER}/" \
     | sed -e "s/__DISABLE_REMOTE_MANAGEMENT__/${DISABLE_REMOTE_MANAGEMENT}/" \
     | sed -e "s/__DISABLE_SCREEN_SHARING__/${DISABLE_SCREEN_SHARING}/" \
+    | sed -e "s/__DISABLE_SIP__/${DISABLE_SIP}/" \
     > "$SUPPORT_DIR/tmp/Scripts/postinstall"
 chmod a+x "$SUPPORT_DIR/tmp/Scripts/postinstall"
 
