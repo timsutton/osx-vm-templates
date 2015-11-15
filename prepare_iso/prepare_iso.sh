@@ -147,8 +147,8 @@ if [ -d "$ESD" ]; then
 fi
 
 VEEWEE_DIR="$(cd "$SCRIPT_DIR/../../../"; pwd)"
-VEEWEE_UID=$(stat -f %u "$VEEWEE_DIR")
-VEEWEE_GID=$(stat -f %g "$VEEWEE_DIR")
+VEEWEE_UID=$(/usr/bin/stat -f %u "$VEEWEE_DIR")
+VEEWEE_GID=$(/usr/bin/stat -f %g "$VEEWEE_DIR")
 DEFINITION_DIR="$(cd "$SCRIPT_DIR/.."; pwd)"
 
 if [ "$2" = "" ]; then
