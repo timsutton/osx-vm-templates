@@ -1,14 +1,14 @@
 # OS X templates for Packer and VeeWee
 
-This is a set of Packer templates and support scripts that will prepare an OS X installer media that performs an unattended install for use with [Packer](http://packer.io) and [VeeWee](http://github.com/jedi4ever/veewee). These were originally developed for VeeWee, but support for the VeeWee template has not been maintained since Packer's release and so it is only provided for historical purposes.
+This is a set of Packer templates and support scripts that will prepare an OS X installer media that performs an unattended install for use with [Packer](http://packer.io) and [VeeWee](http://github.com/jedi4ever/veewee). These were originally developed for VeeWee, but support for the VeeWee template has not been maintained since Packer's release and so it is only provided for historical purposes. I plan on removing VeeWee support from this repo soon, but VeeWee can still make use of the preparation script and the [OS X template](https://github.com/jedi4ever/veewee/tree/master/templates/OSX) remains in the core VeeWee repo.
 
-The machine defaults to being configured for use with [Vagrant](http://www.vagrantup.com), and supports three providers:
+The machine built by this Packer template defaults to being configured for use with [Vagrant](http://www.vagrantup.com), and supports three Vagrant providers by using Packer's respective builders:
 
 - The [Hashicorp VMware Fusion provider](http://www.vagrantup.com/vmware) (recommended)
 - Vagrant's included [VirtualBox provider](http://docs.vagrantup.com/v2/virtualbox/index.html)
 - [Parallels](https://github.com/Parallels/vagrant-parallels)
 
-It's possible to build a machine with different admin account settings, and without the vagrant ssh keys, for use with other systems such as CI.
+It's possible to build a machine with different admin account settings, and without the vagrant ssh keys, for use with other systems, e.g. continuous integration.
 
 Use with the Fusion provider requires Vagrant 1.3.0, and use with the VirtualBox provider Vagrant 1.6.3 if using the Rsync file sync mechanism. Note that the VeeWee template also does not have any VirtualBox or Parallels support.
 
@@ -17,12 +17,19 @@ Provisioning steps that are defined in the template via items in the [scripts](h
 - VM guest tools installation if on VMware
 - Xcode CLI tools installation
 - Chef installation via the [Chef client installer for OS X](https://www.getchef.com/download-chef-client)
-- Puppet installation via [Puppetlabs Mac installers](https://downloads.puppetlabs.com/mac)
+- Puppet installation via [Puppetlabs Mac installers](https://downloads.puppetlabs.com/mac) - no configuration for Puppet 4 yet, coming soon
 
+## Supported guest OS versions
+
+Currently this prepare script and template supports all versions of OS X that are distributed through the App Store: OS X Lion (10.7) through El Capitan (10.11).
+
+This project currently only supplies a single Packer template (`template.json`), so the hypervisor's configured guest OS version (i.e. `darwin12-64`) does not accurately reflect the actual installed OS. I haven't found there to be any functional differences depending on these configured guest versions.
 
 ## Preparing the ISO
 
 OS X's installer cannot be bootstrapped as easily as can Linux or Windows, and so exists the [prepare_iso.sh](https://github.com/timsutton/osx-vm-templates/blob/master/prepare_iso/prepare_iso.sh) script to perform modifications to it that will allow for an automated install and ultimately allow Packer and later, Vagrant, to have SSH access.
+
+**Note:** VirtualBox users currently have to disable Remote Management to avoid [periodic freezing](https://github.com/timsutton/osx-vm-templates/issues/43) of the VM by adding `-D DISABLE_REMOTE_MANAGEMENT` to the `prepare_iso.sh` options. See [Remote Management freezing issue](#remote-management-freezing-issue) for more information.
 
 Run the `prepare_iso.sh` script with two arguments: the path to an `Install OS X.app` or the `InstallESD.dmg` contained within, and an output directory. Root privileges are required in order to write a new DMG with the correct file ownerships. For example, with a 10.8.4 Mountain Lion installer:
 
@@ -35,7 +42,7 @@ Run the `prepare_iso.sh` script with two arguments: the path to an `Install OS X
 -- Done. Built image is located at out/OSX_InstallESD_10.8.4_12E55.dmg. Add this iso and its checksum to your template.
 ```
 
-`prepare_iso.sh` also accepts three command line switches to modify the details of the admin user installed by the script.
+`prepare_iso.sh` accepts command line switches to modify the details of the admin user installed by the script.
 
 * `-u` modifies the name of the admin account, defaulting to `vagrant`
 * `-p` modifies the password of the same account, defaulting to `vagrant`
@@ -45,13 +52,14 @@ For example:
 
 `sudo prepare_iso/prepare_iso.sh -u admin -p password -i /path/to/image.jpg "/Applications/Install OS X Mountain Lion.app" out`
 
+Additionally, flags can be set to disable certain default configuration options.
+
+* `-D DISABLE_REMOTE_MANAGEMENT` disables the Remote Management service.
+* `-D DISABLE_SCREEN_SHARING` disables the Screen Sharing service.
+
 #### Clone this repository
 
 The `prepare_iso.sh` script needs the `support` directory and its content. In other words, the easiest way to run the script is after cloning this repository.
-
-#### Snow Leopard
-
-The `prepare_iso.sh` script depends on `pkgbuild` utility. As `pkgbuild` is not installed on Snow Leopard (contrary to the later OS X), you need to install XCode 3.2.6 which includes it.
 
 ## Use with Packer
 
@@ -95,11 +103,6 @@ The `prepare_iso.sh` script in this repo takes care of mounting and modifying a 
 More details as to the modifications to the installer media are provided in the comments of the script.
 
 
-## Supported guest OS versions
-
-Currently this prepare script and template supports all versions of OS X that are distributed through the App Store: OS X Lion (10.7) through Yosemite (10.10), and currently the El Capitan Betas (10.11).
-
-
 ## Automated GUI logins
 
 For some kinds of automated tasks, it may be necessary to have an active GUI login session (for example, test suites requiring a GUI, or Jenkins SSH slaves requiring a window server for their tasks). The Packer templates support enabling this automatically by using the `autologin` user variable, which can be set to `1` or `true`, for example:
@@ -122,6 +125,24 @@ VirtualBox support is thanks entirely to contributions by [Matt Behrens (@zigg)]
 
 ### Caveats
 
+#### Remote Management freezing issue
+
+The default `prepare_iso.sh` configuration enables Remote Management during installation, which causes the resulting virtual machine to [periodically freeze](https://github.com/timsutton/osx-vm-templates/issues/43). You can avoid enabling Remote Management when using `prepare_iso.sh` by passing `-D DISABLE_REMOTE_MANAGEMENT` this:
+
+```
+sudo ./prepare_iso/prepare_iso.sh -D DISABLE_REMOTE_MANAGEMENT "/Applications/Install OS X El Capitan.app" out
+```
+
+#### Extension Pack
+
+The VirtualBox Extension Pack, available from the [Download VirtualBox](https://www.virtualbox.org/wiki/Downloads) page or as the [Homebrew cask](http://caskroom.io/) [virtualbox-extension-pack](https://github.com/caskroom/homebrew-cask/blob/master/Casks/virtualbox-extension-pack.rb), is now required by default because we enable EHCI (USB 2.0) support like the default VirtualBox OS X template does.
+
+If you cannot use the Extension Pack, you can remove the line that enables EHCI support from [`packer/template.json`](https://github.com/timsutton/osx-vm-templates/blob/master/packer/template.json):
+
+```
+        ["modifyvm", "{{.Name}}", "--usbehci", "on"],
+```
+
 #### Shared folders
 
 Oracle's support for OS X in VirtualBox is very limited, including the lack of guest tools to provide a shared folder mechanism. If using the VirtualBox provider in Vagrant, you will need to configure the shared folder that's set up by default (current folder mapped to `/vagrant`) to use either the `rsync` or `nfs` synced folder mechanisms. You can do this like any other synced folder config in your Vagrantfile:
@@ -134,16 +155,6 @@ Vagrant.configure("2") do |config|
 end
 ```
 
-#### Additional VM configuration for Packer
-
-So far we've seen that the `--cpuidset` option needs to be passed to `modifyvm` as a line in the packer template if a Haswell Intel Mac is used to build the VM, at least as of VirtualBox 4.3.12. It seems to cause a VM crash on at least one older Mac, a Core 2 Duo-based 2010 Mac Mini, though did not cause issues on an Ivy Bridge 2013 iMac I tested. If it's missing on a Haswell Mac, however, the VM hangs indefinitely. This behaviour is likely to change over time as Oracle keeps up with support for OS X guests.
-
-```json
-      "vboxmanage": [
-        ["modifyvm", "{{.Name}}", "--cpuidset", "00000001", "000306a9", "00020800", "80000201", "178bfbff"],
-      ]
-```
-
 
 ## Box sizes
 
@@ -152,4 +163,4 @@ A built box with CLI tools, Puppet and Chef is over 5GB in size. It might be adv
 
 ## Alternate approaches to VM provisioning
 
-Mads Fog Albrechtslund documents an [interesting method](http://hazenet.dk/2013/07/17/creating-a-never-booted-os-x-template-in-vsphere-5-1) for converting unbooted .dmg images into VMDK files for use with ESXi.
+Joe Chilcote has written a tool, [vfuse](https://github.com/chilcote/vfuse), which converts a never-booted OS X image (such as created with a tool like [AutoDMG](https://github.com/MagerValp/AutoDMG)) into a VMDK and configures a VMware Fusion VM. vfuse can also configure a Packer template alongside the VM, configured with the `vmware-vmx` builder.

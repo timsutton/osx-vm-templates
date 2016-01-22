@@ -25,7 +25,13 @@ else
     curl "$DMGURL" -o "$TOOLS"
     TMPMOUNT=`/usr/bin/mktemp -d /tmp/clitools.XXXX`
     hdiutil attach "$TOOLS" -mountpoint "$TMPMOUNT"
-    installer -pkg "$(find $TMPMOUNT -name '*.mpkg')" -target /
+    if [ "$OSX_VERS" -eq 7 ]; then
+        # using '-allowUntrusted' because Lion CLI tools are so old Apple never built another
+        # package that doesn't have an expired CA cert. (Expired February 15, 2015)
+        installer -pkg "$(find $TMPMOUNT -name '*.mpkg')" -allowUntrusted -target /
+    else
+        installer -pkg "$(find $TMPMOUNT -name '*.mpkg')" -target /
+    fi
     hdiutil detach "$TMPMOUNT"
     rm -rf "$TMPMOUNT"
     rm "$TOOLS"

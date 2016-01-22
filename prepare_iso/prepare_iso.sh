@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -e
 #
 # Preparation script for an OS X automated installation for use with VeeWee/Packer/Vagrant
 # 
@@ -21,14 +21,18 @@
 # some process notes here: https://gist.github.com/4542016. The sample minstallconfig.xml,
 # use of OSInstall.collection and readme documentation provided with Greg Neagle's
 # createOSXInstallPkg tool also proved very helpful. (http://code.google.com/p/munki/wiki/InstallingOSX)
+#
 # User creation via package install method also credited to Greg, and made easy with Per
 # Olofsson's CreateUserPkg (http://magervalp.github.io/CreateUserPkg)
+#
+# Antony Blakey for updates to support OS X 10.11:
+# https://github.com/timsutton/osx-vm-templates/issues/40
 
 usage() {
 	cat <<EOF
 Usage:
-$(basename "$0") [-upi] "/path/to/InstallESD.dmg" /path/to/output/directory
-$(basename "$0") [-upi] "/path/to/Install OS X [Name].app" /path/to/output/directory
+$(basename "$0") [-upiD] "/path/to/InstallESD.dmg" /path/to/output/directory
+$(basename "$0") [-upiD] "/path/to/Install OS X [Name].app" /path/to/output/directory
 
 Description:
 Converts an OS X installer to a new image that contains components
@@ -47,8 +51,24 @@ Optional switches:
 
   -a
     Enable auto-login
+
+  -D <flag>
+    Sets the specified flag. Valid flags are:
+      DISABLE_REMOTE_MANAGEMENT
+      DISABLE_SCREEN_SHARING
+      DISABLE_SIP
+
 EOF
 }
+
+cleanup() {
+    hdiutil detach -quiet -force "$MNT_ESD" || echo > /dev/null
+    hdiutil detach -quiet -force "$MNT_BASE_SYSTEM" || echo > /dev/null
+    rm -rf "$MNT_ESD" "$MNT_BASE_SYSTEM" "$BASE_SYSTEM_DMG_RW" "$SHADOW_FILE"
+}
+
+trap cleanup EXIT INT TERM
+
 
 msg_status() {
 	echo "\033[0;32m-- $1\033[0m"
@@ -75,7 +95,12 @@ PASSWORD="vagrant"
 IMAGE_PATH="$SUPPORT_DIR/vagrant.jpg"
 AUTOLOGIN=0
 
-while getopts u:p:i:a OPT; do
+# Flags
+DISABLE_REMOTE_MANAGEMENT=0
+DISABLE_SCREEN_SHARING=0
+DISABLE_SIP=0
+
+while getopts u:p:i:D: OPT; do
   case "$OPT" in
     u)
       USER="$OPTARG"
@@ -88,6 +113,14 @@ while getopts u:p:i:a OPT; do
       ;;
     a)
       AUTOLOGIN=1
+    D)
+      if [ x${!OPTARG} = x0 ]; then
+        eval $OPTARG=1
+      elif [ x${!OPTARG} != x1 ]; then
+        msg_error "Unknown flag: ${OPTARG}"
+        usage
+        exit 1
+      fi
       ;;
     \?)
       usage
@@ -120,8 +153,8 @@ if [ -d "$ESD" ]; then
 fi
 
 VEEWEE_DIR="$(cd "$SCRIPT_DIR/../../../"; pwd)"
-VEEWEE_UID=$(stat -f %u "$VEEWEE_DIR")
-VEEWEE_GID=$(stat -f %g "$VEEWEE_DIR")
+VEEWEE_UID=$(/usr/bin/stat -f %u "$VEEWEE_DIR")
+VEEWEE_GID=$(/usr/bin/stat -f %g "$VEEWEE_DIR")
 DEFINITION_DIR="$(cd "$SCRIPT_DIR/.."; pwd)"
 
 if [ "$2" = "" ]; then
@@ -203,7 +236,12 @@ USER_GUID=$(/usr/libexec/PlistBuddy -c 'Print :generateduid:0' "$SUPPORT_DIR/use
 
 # postinstall script
 mkdir -p "$SUPPORT_DIR/tmp/Scripts"
-cat "$SUPPORT_DIR/pkg-postinstall" | sed -e "s/__USER__PLACEHOLDER__/${USER}/" > "$SUPPORT_DIR/tmp/Scripts/postinstall"
+cat "$SUPPORT_DIR/pkg-postinstall" \
+    | sed -e "s/__USER__PLACEHOLDER__/${USER}/" \
+    | sed -e "s/__DISABLE_REMOTE_MANAGEMENT__/${DISABLE_REMOTE_MANAGEMENT}/" \
+    | sed -e "s/__DISABLE_SCREEN_SHARING__/${DISABLE_SCREEN_SHARING}/" \
+    | sed -e "s/__DISABLE_SIP__/${DISABLE_SIP}/" \
+    > "$SUPPORT_DIR/tmp/Scripts/postinstall"
 chmod a+x "$SUPPORT_DIR/tmp/Scripts/postinstall"
 if [ $AUTOLOGIN -eq 1 ]; then
   # create password in /var/tmp
@@ -232,22 +270,28 @@ hdiutil detach "$MNT_BASE_SYSTEM"
 
 BASE_SYSTEM_DMG_RW="$(/usr/bin/mktemp /tmp/veewee-osx-basesystem-rw.XXXX).dmg"
 
-msg_status "Converting BaseSystem.dmg to a read-write DMG located at $BASE_SYSTEM_DMG_RW.."
-# hdiutil convert -o will actually append .dmg to the filename if it has no extn
-hdiutil convert -format UDRW -o "$BASE_SYSTEM_DMG_RW" "$BASE_SYSTEM_DMG"
-
-if [ $DMG_OS_VERS_MAJOR -ge 9 ]; then
-	msg_status "Growing new BaseSystem.."
-	hdiutil resize -size 7G "$BASE_SYSTEM_DMG_RW"
-fi
-
-msg_status "Mounting new BaseSystem.."
+msg_status "Creating empty read-write DMG located at $BASE_SYSTEM_DMG_RW.."
+hdiutil create -o "$BASE_SYSTEM_DMG_RW" -size 10g -layout SPUD -fs HFS+J
 hdiutil attach "$BASE_SYSTEM_DMG_RW" -mountpoint "$MNT_BASE_SYSTEM" -nobrowse -owners on
+
+msg_status "Restoring ('asr restore') the BaseSystem to the read-write DMG.."
+# This asr restore was needed as of 10.11 DP7 and up. See
+# https://github.com/timsutton/osx-vm-templates/issues/40
+#
+# Note that when the restore completes, the volume is automatically re-mounted
+# and not with the '-nobrowse' option. It's an annoyance we could possibly fix
+# in the future..
+asr restore --source "$BASE_SYSTEM_DMG" --target "$MNT_BASE_SYSTEM" --noprompt --noverify --erase
+rm -r "$MNT_BASE_SYSTEM"
+
 if [ $DMG_OS_VERS_MAJOR -ge 9 ]; then
-	rm "$MNT_BASE_SYSTEM/System/Installation/Packages"
+    MNT_BASE_SYSTEM="/Volumes/OS X Base System"
+    BASESYSTEM_OUTPUT_IMAGE="$OUTPUT_DMG"
+    PACKAGES_DIR="$MNT_BASE_SYSTEM/System/Installation/Packages"
+
+    rm "$PACKAGES_DIR"
 	msg_status "Moving 'Packages' directory from the ESD to BaseSystem.."
 	mv -v "$MNT_ESD/Packages" "$MNT_BASE_SYSTEM/System/Installation/"
-	PACKAGES_DIR="$MNT_BASE_SYSTEM/System/Installation/Packages"
 
 	# This isn't strictly required for Mavericks, but Yosemite will consider the
 	# installer corrupt if this isn't included, because it cannot verify BaseSystem's
@@ -256,6 +300,9 @@ if [ $DMG_OS_VERS_MAJOR -ge 9 ]; then
 	cp "$MNT_ESD/BaseSystem.dmg" "$MNT_BASE_SYSTEM/"
 	cp "$MNT_ESD/BaseSystem.chunklist" "$MNT_BASE_SYSTEM/"
 else
+    MNT_BASE_SYSTEM="/Volumes/Mac OS X Base System"
+    BASESYSTEM_OUTPUT_IMAGE="$MNT_ESD/BaseSystem.dmg"
+    rm "$BASESYSTEM_OUTPUT_IMAGE"
 	PACKAGES_DIR="$MNT_ESD/Packages"
 fi
 
@@ -274,7 +321,6 @@ hdiutil detach "$MNT_BASE_SYSTEM"
 
 if [ $DMG_OS_VERS_MAJOR -lt 9 ]; then
 	msg_status "Pre-Mavericks we save back the modified BaseSystem to the root of the ESD."
-	rm "$MNT_ESD/BaseSystem.dmg"
 	hdiutil convert -format UDZO -o "$MNT_ESD/BaseSystem.dmg" "$BASE_SYSTEM_DMG_RW"
 fi
 
