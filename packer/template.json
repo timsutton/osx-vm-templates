@@ -108,6 +108,7 @@
         "../scripts/chef-omnibus.sh",
         "../scripts/puppet.sh",
         "../scripts/add-network-interface-detection.sh",
+        "../scripts/disable-beam-sync.sh",
         "../scripts/autologin.sh",
         "../scripts/system-update.sh",
         "../scripts/shrink.sh"
