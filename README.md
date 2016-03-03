@@ -119,6 +119,14 @@ Packer will instruct the system to download and install all available OS X updat
 packer build -var update_system=0 template.json
 ```
 
+## Provisioning delay
+
+In some cases, it may be helpful to insert a delay into the beginning of the provisioning process. Adding a delay of about 30 seconds may help subsequent provisioning steps that install software from the internet complete successfully. By default, the delay is set to `0`, but you can change the delay by setting the `provisioning_delay` variable:
+
+```
+packer build -var provisioning_delay=30 template.json`
+```
+
 ## VirtualBox support
 
 VirtualBox support is thanks entirely to contributions by [Matt Behrens (@zigg)](https://github.com/zigg) to this repo, Vagrant and Packer.
