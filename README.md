@@ -111,6 +111,15 @@ For some kinds of automated tasks, it may be necessary to have an active GUI log
 
 This was easily made possible thanks to Per Olofsson's [CreateUserPkg](http://magervalp.github.com/CreateUserPkg) utility, which was used to help create the box's vagrant user in the `prepare_iso` script, and which also supports generating the magic kcpassword file with a particular hash format to set up the auto-login.
 
+## Xcode Command Line Tools
+
+The Xcode CLI tools are installed by the packer template by default. To disable the installation, set the `install_xcode_cli_tools` variable to `false`:
+
+```
+packer build -var install_xcode_cli_tools=false template.json
+```
+
+
 ## System updates
 
 Packer will instruct the system to download and install all available OS X updates, if you want to disable this default behaviour, use `update_system` variable:
