@@ -94,6 +94,10 @@
   ],
   "provisioners": [
     {
+      "type": "shell-local",
+      "command": "sleep {{user `provisioning_delay`}}"
+    },
+    {
       "destination": "/private/tmp/set_kcpassword.py",
       "source": "../scripts/support/set_kcpassword.py",
       "type": "file"
@@ -137,6 +141,7 @@
     "iso_url": "OSX_InstallESD_10.11.1_15B42.dmg",
     "nocm": "false",
     "password": "vagrant",
+    "provisioning_delay": "0",
     "puppet_version": "latest",
     "update_system": "true",
     "username": "vagrant"
