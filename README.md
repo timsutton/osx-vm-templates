@@ -63,7 +63,7 @@ The `prepare_iso.sh` script needs the `support` directory and its content. In ot
 
 ## Use with Packer
 
-The path and checksum can now be added to your Packer template or provided as [user variables](http://www.packer.io/docs/templates/user-variables.html). The `packer` directory contains a template that can be used with the `vmware-iso` and `virtualbox-iso` builders. The `veewee` directory contains a definition, though as mentioned above it is not currently being maintained.
+The path can now be added to your Packer template or provided as [user variables](http://www.packer.io/docs/templates/user-variables.html). The `packer` directory contains a template that can be used with the `vmware-iso` and `virtualbox-iso` builders. The checksum does not need to be added because the `iso_checksum_type` has been set to "none". The `veewee` directory contains a definition, though as mentioned above it is not currently being maintained.
 
 The Packer template adds some additional VM options required for OS X guests. Note that the paths given in the Packer template's `iso_url` builder key accepts file paths, both absolute and relative (to the current working directory).
 
@@ -72,7 +72,6 @@ Given the above output, we could run then run packer:
 ```sh
 cd packer
 packer build \
-  -var iso_checksum=dc93ded64396574897a5f41d6dd7066c \
   -var iso_url=../out/OSX_InstallESD_10.8.4_12E55.dmg \
   template.json
 ```
@@ -85,7 +84,6 @@ For example:
 
 ```
 packer build \
-  -var iso_checksum=dc93ded64396574897a5f41d6dd7066c \
   -var iso_url=../out/OSX_InstallESD_10.8.4_12E55.dmg \
   -var username=youruser \
   -var password=yourpassword \
@@ -98,7 +96,7 @@ packer build \
 
 OS X's installer supports a kind of bootstrap install functionality similar to Linux and Windows, however it must be invoked using pre-existing files placed on the booted installation media. This approach is roughly equivalent to that used by Apple's System Image Utility for deploying automated OS X installations and image restoration.
 
-The `prepare_iso.sh` script in this repo takes care of mounting and modifying a vanilla OS X installer downloaded from the Mac App Store. The resulting .dmg file and checksum can then be added to the Packer template. Because the preparation is done up front, no boot command sequences, attached devices or web server access is required.
+The `prepare_iso.sh` script in this repo takes care of mounting and modifying a vanilla OS X installer downloaded from the Mac App Store. The resulting .dmg file can then be added to the Packer template. Because the preparation is done up front, no boot command sequences, attached devices or web server access is required.
 
 More details as to the modifications to the installer media are provided in the comments of the script.
 
