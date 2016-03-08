@@ -4,8 +4,7 @@
       "boot_wait": "5s",
       "disk_size": 40960,
       "guest_os_type": "win-8",
-      "iso_checksum_type": "md5",
-      "iso_checksum": "{{user `iso_checksum`}}",
+      "iso_checksum_type": "none",
       "iso_url": "{{user `iso_url`}}",
       "shutdown_command": "echo '{{user `username`}}'|sudo -S shutdown -h now",
       "ssh_port": 22,
@@ -32,8 +31,7 @@
       "boot_wait": "10s",
       "disk_size": 80480,
       "guest_os_type": "darwin12-64",
-      "iso_checksum_type": "md5",
-      "iso_checksum": "{{user `iso_checksum`}}",
+      "iso_checksum_type": "none",
       "iso_url": "{{user `iso_url`}}",
       "shutdown_command": "echo '{{user `username`}}'|sudo -S shutdown -h now",
       "skip_compaction": true,
@@ -73,8 +71,7 @@
       "guest_additions_mode": "disable",
       "guest_os_type": "MacOS1011_64",
       "hard_drive_interface": "sata",
-      "iso_checksum_type": "md5",
-      "iso_checksum": "{{user `iso_checksum`}}",
+      "iso_checksum_type": "none",
       "iso_interface": "sata",
       "iso_url": "{{user `iso_url`}}",
       "shutdown_command": "echo '{{user `username`}}'|sudo -S shutdown -h now",
@@ -114,6 +111,15 @@
   ],
   "provisioners": [
     {
+      "type": "shell-local",
+      "command": "sleep {{user `provisioning_delay`}}"
+    },
+    {
+      "destination": "/private/tmp/set_kcpassword.py",
+      "source": "../scripts/support/set_kcpassword.py",
+      "type": "file"
+    },
+    {
       "execute_command": "chmod +x {{ .Path }}; sudo {{ .Vars }} {{ .Path }}",
       "scripts": [
         "../scripts/vagrant.sh",
@@ -133,6 +139,8 @@
         "FACTER_VERSION={{user `facter_version`}}",
         "HIERA_VERSION={{user `hiera_version`}}",
         "INSTALL_VAGRANT_KEYS={{user `install_vagrant_keys`}}",
+        "NOCM={{user `nocm`}}",
+        "INSTALL_XCODE_CLI_TOOLS={{user `install_xcode_cli_tools`}}",
         "PASSWORD={{user `password`}}",
         "PUPPET_VERSION={{user `puppet_version`}}",
         "UPDATE_SYSTEM={{user `update_system`}}",
@@ -147,11 +155,11 @@
     "facter_version": "latest",
     "hiera_version": "latest",
     "install_vagrant_keys": "true",
-    "iso_checksum": "b78fef812ca50da24381e45e56fb9285",
+    "install_xcode_cli_tools": "true",
     "iso_url": "OSX_InstallESD_10.11.1_15B42.dmg",
+    "nocm": "false",
     "password": "vagrant",
-    "install_vagrant_keys": true,
-    "update_system": true
+    "provisioning_delay": "0",
     "puppet_version": "latest",
     "update_system": "true",
     "username": "vagrant"

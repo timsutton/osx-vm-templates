@@ -63,7 +63,7 @@ The `prepare_iso.sh` script needs the `support` directory and its content. In ot
 
 ## Use with Packer
 
-The path and checksum can now be added to your Packer template or provided as [user variables](http://www.packer.io/docs/templates/user-variables.html). The `packer` directory contains a template that can be used with the `vmware-iso` and `virtualbox-iso` builders. The `veewee` directory contains a definition, though as mentioned above it is not currently being maintained.
+The path can now be added to your Packer template or provided as [user variables](http://www.packer.io/docs/templates/user-variables.html). The `packer` directory contains a template that can be used with the `vmware-iso` and `virtualbox-iso` builders. The checksum does not need to be added because the `iso_checksum_type` has been set to "none". The `veewee` directory contains a definition, though as mentioned above it is not currently being maintained.
 
 The Packer template adds some additional VM options required for OS X guests. Note that the paths given in the Packer template's `iso_url` builder key accepts file paths, both absolute and relative (to the current working directory).
 
@@ -72,7 +72,6 @@ Given the above output, we could run then run packer:
 ```sh
 cd packer
 packer build \
-  -var iso_checksum=dc93ded64396574897a5f41d6dd7066c \
   -var iso_url=../out/OSX_InstallESD_10.8.4_12E55.dmg \
   template.json
 ```
@@ -85,7 +84,6 @@ For example:
 
 ```
 packer build \
-  -var iso_checksum=dc93ded64396574897a5f41d6dd7066c \
   -var iso_url=../out/OSX_InstallESD_10.8.4_12E55.dmg \
   -var username=youruser \
   -var password=yourpassword \
@@ -98,7 +96,7 @@ packer build \
 
 OS X's installer supports a kind of bootstrap install functionality similar to Linux and Windows, however it must be invoked using pre-existing files placed on the booted installation media. This approach is roughly equivalent to that used by Apple's System Image Utility for deploying automated OS X installations and image restoration.
 
-The `prepare_iso.sh` script in this repo takes care of mounting and modifying a vanilla OS X installer downloaded from the Mac App Store. The resulting .dmg file and checksum can then be added to the Packer template. Because the preparation is done up front, no boot command sequences, attached devices or web server access is required.
+The `prepare_iso.sh` script in this repo takes care of mounting and modifying a vanilla OS X installer downloaded from the Mac App Store. The resulting .dmg file can then be added to the Packer template. Because the preparation is done up front, no boot command sequences, attached devices or web server access is required.
 
 More details as to the modifications to the installer media are provided in the comments of the script.
 
@@ -111,12 +109,36 @@ For some kinds of automated tasks, it may be necessary to have an active GUI log
 
 This was easily made possible thanks to Per Olofsson's [CreateUserPkg](http://magervalp.github.com/CreateUserPkg) utility, which was used to help create the box's vagrant user in the `prepare_iso` script, and which also supports generating the magic kcpassword file with a particular hash format to set up the auto-login.
 
+## Configuration management
+
+By default, the packer template installs the Chef and Puppet configuration management tools. You can disable the installation of configuration management entirely by setting the `nocm` variable to `true`:
+
+```
+packer build -var nocm=true template.json
+```
+
+## Xcode Command Line Tools
+
+The Xcode CLI tools are installed by the packer template by default. To disable the installation, set the `install_xcode_cli_tools` variable to `false`:
+
+```
+packer build -var install_xcode_cli_tools=false template.json
+```
+
 ## System updates
 
 Packer will instruct the system to download and install all available OS X updates, if you want to disable this default behaviour, use `update_system` variable:
 
 ```
 packer build -var update_system=0 template.json
+```
+
+## Provisioning delay
+
+In some cases, it may be helpful to insert a delay into the beginning of the provisioning process. Adding a delay of about 30 seconds may help subsequent provisioning steps that install software from the internet complete successfully. By default, the delay is set to `0`, but you can change the delay by setting the `provisioning_delay` variable:
+
+```
+packer build -var provisioning_delay=30 template.json`
 ```
 
 ## VirtualBox support

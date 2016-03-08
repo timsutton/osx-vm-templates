@@ -8,6 +8,10 @@
 # install function mostly borrowed dmg function from hashicorp/puppet-bootstrap,
 # except we just take an already-downloaded dmg
 
+if [[ "$NOCM" =~ ^(true|yes|on|1|TRUE|YES|ON])$ ]]; then
+    exit
+fi
+
 install_dmg() {
     local name="$1"
     local dmg_path="$2"
