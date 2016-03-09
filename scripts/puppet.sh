@@ -8,7 +8,7 @@
 # install function mostly borrowed dmg function from hashicorp/puppet-bootstrap,
 # except we just take an already-downloaded dmg
 
-if [[ "$NOCM" =~ ^(true|yes|on|1|TRUE|YES|ON])$ ]]; then
+if [[ "${PUPPET_VERSION}" == "none" && "${FACTER_VERSION}" == "none" && "${HIERA_VERSION}" == "none" ]]; then
     exit
 fi
 
@@ -59,15 +59,20 @@ AUTOPKG="$AUTOPKG_DIR/Code/autopkg"
 
 # Redirect AutoPkg cache to a temp location
 defaults write com.github.autopkg CACHE_DIR -string "$(mktemp -d /tmp/autopkg-cache-XXX)"
-# Retrieve the installer DMGs
-PUPPET_DMG=$(get_dmg Puppet.download "${PUPPET_VERSION}")
-FACTER_DMG=$(get_dmg Facter.download "${FACTER_VERSION}")
-HIERA_DMG=$(get_dmg Hiera.download "${HIERA_VERSION}")
 
-# Install them
-install_dmg "Puppet" "${PUPPET_DMG}"
-install_dmg "Facter" "${FACTER_DMG}"
-install_dmg "Hiera" "${HIERA_DMG}"
+# Retrieve the installer DMGs and install them
+if [[ "${PUPPET_VERSION}" != "none" ]]; then
+  PUPPET_DMG=$(get_dmg Puppet.download "${PUPPET_VERSION}")
+  install_dmg "Puppet" "${PUPPET_DMG}"
+fi
+if [[ "${FACTER_VERSION}" != "none" ]]; then
+  FACTER_DMG=$(get_dmg Facter.download "${FACTER_VERSION}")
+  install_dmg "Facter" "${FACTER_DMG}"
+fi
+if [[ "${HIERA_VERSION}" != "none" ]]; then
+  HIERA_DMG=$(get_dmg Hiera.download "${HIERA_VERSION}")
+  install_dmg "Hiera" "${HIERA_DMG}"
+fi
 
 # Hide all users from the loginwindow with uid below 500, which will include the puppet user
 defaults write /Library/Preferences/com.apple.loginwindow Hide500Users -bool YES

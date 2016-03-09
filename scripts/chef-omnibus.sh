@@ -1,7 +1,7 @@
 #!/bin/bash
 # http://www.opscode.com/chef/install
 
-if [[ "$NOCM" =~ ^(true|yes|on|1|TRUE|YES|ON])$ ]]; then
+if [[ "${CHEF_VERSION}" == "none" ]]; then
     exit
 fi
 
