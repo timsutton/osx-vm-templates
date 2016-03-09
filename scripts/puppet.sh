@@ -8,7 +8,7 @@
 # install function mostly borrowed dmg function from hashicorp/puppet-bootstrap,
 # except we just take an already-downloaded dmg
 
-if [[ "$NOCM" =~ ^(true|yes|on|1|TRUE|YES|ON])$ ]]; then
+if [[ "${PUPPET_VERSION}" == "none" && "${FACTER_VERSION}" == "none" && "${HIERA_VERSION}" == "none" ]]; then
     exit
 fi
 
