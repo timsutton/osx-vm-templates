@@ -5,6 +5,10 @@ if [[ "$NOCM" =~ ^(true|yes|on|1|TRUE|YES|ON])$ ]]; then
     exit
 fi
 
+if [ "${CHEF_VERSION}" == "none" ]; then
+    exit
+fi
+
 INSTALL_ARGS=""
 
 if [ "${CHEF_VERSION}" != "latest" ]; then
