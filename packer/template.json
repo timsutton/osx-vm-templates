@@ -131,16 +131,15 @@
   ],
   "variables": {
     "autologin": "false",
-    "chef_version": "latest",
-    "facter_version": "latest",
-    "hiera_version": "latest",
+    "chef_version": "none",
+    "facter_version": "none",
+    "hiera_version": "none",
     "install_vagrant_keys": "true",
     "install_xcode_cli_tools": "true",
     "iso_url": "OSX_InstallESD_10.11.1_15B42.dmg",
-    "nocm": "false",
     "password": "vagrant",
     "provisioning_delay": "0",
-    "puppet_version": "latest",
+    "puppet_version": "none",
     "update_system": "true",
     "username": "vagrant"
   }
