@@ -69,7 +69,7 @@ if [[ "${FACTER_VERSION}" != "none" ]]; then
   FACTER_DMG=$(get_dmg Facter.download "${FACTER_VERSION}")
   install_dmg "Facter" "${FACTER_DMG}"
 fi
-if [[ "${HIERA_DMG}" != "none" ]]; then
+if [[ "${HIERA_VERSION}" != "none" ]]; then
   HIERA_DMG=$(get_dmg Hiera.download "${HIERA_VERSION}")
   install_dmg "Hiera" "${HIERA_DMG}"
 fi
