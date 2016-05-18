@@ -100,7 +100,7 @@ DISABLE_REMOTE_MANAGEMENT=0
 DISABLE_SCREEN_SHARING=0
 DISABLE_SIP=0
 
-while getopts u:p:i:D: OPT; do
+while getopts u:p:i:D:a: OPT; do
   case "$OPT" in
     u)
       USER="$OPTARG"
@@ -113,6 +113,7 @@ while getopts u:p:i:D: OPT; do
       ;;
     a)
       AUTOLOGIN=1
+      ;;
     D)
       if [ x${!OPTARG} = x0 ]; then
         eval $OPTARG=1
