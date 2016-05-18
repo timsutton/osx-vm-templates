@@ -111,10 +111,18 @@ This was easily made possible thanks to Per Olofsson's [CreateUserPkg](http://ma
 
 ## Configuration management
 
-By default, the packer template installs the Chef and Puppet configuration management tools. You can disable the installation of configuration management entirely by setting the `nocm` variable to `true`:
+By default, the packer template does not install the Chef or Puppet configuration management tools. You can enable the installation of configuration management by setting the `chef_version`, `puppet_version`, `facter_version`, and `hiera_version` variables to `latest`, or to a specific version.
+
+To install the latest version of Chef:
 
 ```
-packer build -var nocm=true template.json
+packer build -var chef_version=latest template.json
+```
+
+To install the latest versions of Puppet, Facter and Hiera:
+
+```
+packer build -var puppet_version=latest facter_version=latest hiera_version=latest template.json
 ```
 
 ## Xcode Command Line Tools
