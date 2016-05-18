@@ -28,8 +28,8 @@
       ]
     },
     {
-      "boot_wait": "10s",
-      "disk_size": 80480,
+      "boot_wait": "2s",
+      "disk_size": 40960,
       "guest_os_type": "darwin12-64",
       "iso_checksum_type": "none",
       "iso_url": "{{user `iso_url`}}",
@@ -41,29 +41,18 @@
       "ssh_wait_timeout": "10000s",
       "tools_upload_flavor": "darwin",
       "type": "vmware-iso",
-      "output_directory": "aspera-packer",
       "vmx_data": {
-        "cpuid.coresPerSocket": "2",
-        "memsize": "4096",
-        "numvcpus": "2",
+        "cpuid.coresPerSocket": "1",
+        "memsize": "2048",
+        "numvcpus": "1",
         "firmware": "efi",
         "keyboardAndMouseProfile": "macProfile",
         "smc.present": "TRUE",
         "hpet0.present": "TRUE",
         "ich7m.present": "TRUE",
         "ehci.present": "TRUE",
-        "usb.present": "TRUE",
-        "ethernet0.present": "TRUE",
-        "ethernet0.startConnected": "TRUE",
-        "ethernet0.virtualDev": "e1000",
-        "ethernet0.networkName": "VM Network",
-        "ethernet0.addressType": "generated"
-      },
-      "remote_type": "esx5",
-      "remote_host": "10.0.14.101",
-      "remote_datastore": "local_14-101_d2", 
-      "remote_username": "admin",
-      "remote_password": "Pate1P1D6x_"
+        "usb.present": "TRUE"
+      }
     },
     {
       "boot_wait": "2s",
@@ -98,16 +87,7 @@
   ],
   "min_packer_version": "0.7.0",
   "post-processors": [
-    {
-      "output": "../builds/{{.Provider}}/aspera_macosx_10_9_chef-{{user `chef_version`}}.box",
-      "override": {
-        "parallels": {
-          "vagrantfile_template": "vagrantfile_templates/parallels/freebsd.rb"
-        }
-      },
-      "type": "vagrant",
-      "except": ["vmware-iso"]
-    }
+    "vagrant"
   ],
   "provisioners": [
     {
