@@ -7,7 +7,7 @@ if [[ "$PACKER_BUILDER_TYPE" == vmware* ]]; then
     TOOLS_PATH="/Users/$USERNAME/darwin.iso"
     if [ -e .vmfusion_version ]; then
       MOUNT_COMMAND='hdiutil attach'
-      $MOUNT_COMMAND "$DEVICE_PATH" -mountpoint "$TMPMOUNT"
+      $MOUNT_COMMAND "$TOOLS_PATH" -mountpoint "$TMPMOUNT"
       if [ ! -e "$TOOLS_PATH" ]; then
         echo "Couldn't locate uploaded tools iso at $TOOLS_PATH!"
         exit 1
