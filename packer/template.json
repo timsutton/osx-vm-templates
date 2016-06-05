@@ -23,7 +23,7 @@
         ["set", "{{.Name}}", "--auto-share-camera", "off"],
         ["set", "{{.Name}}", "--auto-share-bluetooth", "off"],
         ["set", "{{.Name}}", "--on-window-close", "keep-running"],
-        ["set", "{{.Name}}", "--isolate-vm", "on"],
+        ["set", "{{.Name}}", "--isolate-vm", "off"],
         ["set", "{{.Name}}", "--shf-host", "off"]
       ]
     },
