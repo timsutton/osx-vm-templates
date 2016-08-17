@@ -45,9 +45,11 @@ get_dmg() {
         "${report_path}"
 }
 
-PUPPET_VERSION=${PUPPET_VERSION:-latest}
-FACTER_VERSION=${FACTER_VERSION:-latest}
-HIERA_VERSION=${HIERA_VERSION:-latest}
+# Default to installing the current version of Puppet - it's not 2013 anymore.
+PUPPET_VERSION=${PUPPET_VERSION:-none}
+FACTER_VERSION=${FACTER_VERSION:-none}
+HIERA_VERSION=${HIERA_VERSION:-none}
+PUPPET_AGENT_VERSION=${PUPPET_AGENT_VERSION:-latest}
 
 # Get AutoPkg
 AUTOPKG_DIR=$(mktemp -d /tmp/autopkg-XXXX)
@@ -61,8 +63,17 @@ AUTOPKG="$AUTOPKG_DIR/Code/autopkg"
 defaults write com.github.autopkg CACHE_DIR -string "$(mktemp -d /tmp/autopkg-cache-XXX)"
 
 if [ "${PUPPET_VERSION}" != "none" ]; then
+  # Hide all users from the loginwindow with uid below 500, which will include the puppet user
+  defaults write /Library/Preferences/com.apple.loginwindow Hide500Users -bool YES
   PUPPET_DMG=$(get_dmg Puppet.download "${PUPPET_VERSION}")
   install_dmg "Puppet" "${PUPPET_DMG}"
+fi
+
+if [ "${PUPPET_AGENT_VERSION}" != "none" ]; then
+  # Hide all users from the loginwindow with uid below 500, which will include the puppet user
+  defaults write /Library/Preferences/com.apple.loginwindow Hide500Users -bool YES
+  PUPPET_AGENT_DMG=$(get_dmg Puppet-Agent.download "${PUPPET_AGENT_VERSION}")
+  install_dmg "Puppet Agent" "${PUPPET_AGENT_DMG}"
 fi
 
 if [ "${FACTER_VERSION}" != "none" ]; then
@@ -75,8 +86,8 @@ if [ "${HIERA_VERSION}" != "none" ]; then
   install_dmg "Hiera" "${HIERA_DMG}"
 fi
 
-# Hide all users from the loginwindow with uid below 500, which will include the puppet user
-defaults write /Library/Preferences/com.apple.loginwindow Hide500Users -bool YES
 
 # Clean up
-rm -rf "${PUPPET_DMG}" "${FACTER_DMG}" "${HIERA_DMG}" "${AUTOPKG_DIR}" "~/Library/AutoPkg"
+rm -rf "${PUPPET_DMG}" "${FACTER_DMG}" "${HIERA_DMG}" "${PUPPET_AGENT_DMG}" "${AUTOPKG_DIR}" "~/Library/AutoPkg"
+
+defaults delete com.github.autopkg
