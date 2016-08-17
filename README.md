@@ -111,7 +111,7 @@ This was easily made possible thanks to Per Olofsson's [CreateUserPkg](http://ma
 
 ## Configuration management
 
-By default, the packer template does not install the Chef or Puppet configuration management tools. You can enable the installation of configuration management by setting the `chef_version`, `puppet_version`, `facter_version`, and `hiera_version` variables to `latest`, or to a specific version.
+By default, the packer template does not install the Chef or Puppet configuration management tools. You can enable the installation of configuration management by setting the `chef_version`, `puppet_agent_version`, `puppet_version`, `facter_version`, and `hiera_version` variables to `latest`, or to a specific version.
 
 To install the latest version of Chef:
 
@@ -119,7 +119,13 @@ To install the latest version of Chef:
 packer build -var chef_version=latest template.json
 ```
 
-To install the latest versions of Puppet, Facter and Hiera:
+To install the last version of Puppet Agent:
+
+```
+packer build -var pupet_agent_version=latest template.json
+```
+
+To install the last versions of the deprecated standalone Puppet, Facter and Hiera packages:
 
 ```
 packer build -var puppet_version=latest facter_version=latest hiera_version=latest template.json
