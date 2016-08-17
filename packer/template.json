@@ -122,6 +122,7 @@
         "INSTALL_XCODE_CLI_TOOLS={{user `install_xcode_cli_tools`}}",
         "PASSWORD={{user `password`}}",
         "PUPPET_VERSION={{user `puppet_version`}}",
+        "PUPPET_AGENT_VERSION={{user `puppet_agent_version`}}",
         "UPDATE_SYSTEM={{user `update_system`}}",
         "USERNAME={{user `username`}}"
       ],
@@ -139,6 +140,7 @@
     "password": "vagrant",
     "provisioning_delay": "0",
     "puppet_version": "none",
+    "puppet_agent_version": "none",
     "update_system": "true",
     "username": "vagrant"
   }
