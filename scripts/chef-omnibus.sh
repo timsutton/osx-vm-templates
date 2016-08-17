@@ -11,5 +11,6 @@ if [ "${CHEF_VERSION}" != "latest" ]; then
 fi
 
 curl -LO https://www.chef.io/chef/install.sh
-bash ./install.sh "${INSTALL_ARGS}"
+chmod +x ./install.sh
+./install.sh "${INSTALL_ARGS}"
 rm install.sh
