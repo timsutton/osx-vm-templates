@@ -115,6 +115,7 @@
         "../scripts/add-network-interface-detection.sh",
         "../scripts/autologin.sh",
         "../scripts/system-update.sh",
+        "../scripts/osx_config.sh",
         "../scripts/shrink.sh"
       ],
       "environment_vars": [
