@@ -24,7 +24,7 @@ Provisioning steps that are defined in the template via items in the [scripts](h
 
 ## Supported guest OS versions
 
-Currently this prepare script and template supports all versions of OS X that are distributed through the App Store: OS X Lion (10.7) through El Capitan (10.11), and the macOS Sierra (10.12) GM Seed.
+Currently this prepare script and template supports all versions of OS X that are distributed through the App Store: OS X Lion (10.7) through El Capitan (10.11), and macOS Sierra (10.12).
 
 This project currently only supplies a single Packer template (`template.json`), so the hypervisor's configured guest OS version (i.e. `darwin12-64`) does not accurately reflect the actual installed OS. I haven't found there to be any functional differences depending on these configured guest versions.
 
