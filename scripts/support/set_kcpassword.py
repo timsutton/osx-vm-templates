@@ -7,10 +7,11 @@
 import sys
 import os
 
+
 def kcpassword(passwd):
     # The magic 11 bytes - these are just repeated
     # 0x7D 0x89 0x52 0x23 0xD2 0xBC 0xDD 0xEA 0xA3 0xB9 0x1F
-    key = [125,137,82,35,210,188,221,234,163,185,31]
+    key = [125, 137, 82, 35, 210, 188, 221, 234, 163, 185, 31]
     key_len = len(key)
 
     passwd = [ord(x) for x in list(passwd)]
