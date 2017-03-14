@@ -15,7 +15,7 @@ if [ "$OSX_VERS" -ge 9 ]; then
     # find the CLI Tools update
     PROD=$(softwareupdate -l | grep "\*.*Command Line" | head -n 1 | awk -F"*" '{print $2}' | sed -e 's/^ *//' | tr -d '\n')
     # install it
-    softwareupdate -i "$PROD" -v
+    softwareupdate -i "$PROD" --verbose
     rm /tmp/.com.apple.dt.CommandLineTools.installondemand.in-progress
 
 # on 10.7/10.8, we instead download from public download URLs, which can be found in

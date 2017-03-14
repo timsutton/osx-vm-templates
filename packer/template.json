@@ -23,7 +23,6 @@
         ["set", "{{.Name}}", "--auto-share-camera", "off"],
         ["set", "{{.Name}}", "--auto-share-bluetooth", "off"],
         ["set", "{{.Name}}", "--on-window-close", "keep-running"],
-        ["set", "{{.Name}}", "--isolate-vm", "on"],
         ["set", "{{.Name}}", "--shf-host", "off"]
       ]
     },
@@ -79,7 +78,6 @@
         ["modifyvm", "{{.Name}}", "--keyboard", "usb"],
         ["modifyvm", "{{.Name}}", "--memory", "2048"],
         ["modifyvm", "{{.Name}}", "--mouse", "usbtablet"],
-        ["modifyvm", "{{.Name}}", "--usbehci", "on"],
         ["modifyvm", "{{.Name}}", "--vram", "128"],
         ["storagectl", "{{.Name}}", "--name", "IDE Controller", "--remove"]
       ]
@@ -123,6 +121,7 @@
         "INSTALL_XCODE_CLI_TOOLS={{user `install_xcode_cli_tools`}}",
         "PASSWORD={{user `password`}}",
         "PUPPET_VERSION={{user `puppet_version`}}",
+        "PUPPET_AGENT_VERSION={{user `puppet_agent_version`}}",
         "UPDATE_SYSTEM={{user `update_system`}}",
         "USERNAME={{user `username`}}"
       ],
@@ -140,6 +139,7 @@
     "password": "vagrant",
     "provisioning_delay": "0",
     "puppet_version": "none",
+    "puppet_agent_version": "none",
     "update_system": "true",
     "username": "vagrant"
   }

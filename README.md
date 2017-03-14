@@ -8,20 +8,23 @@ The machine built by this Packer template defaults to being configured for use w
 - Vagrant's included [VirtualBox provider](http://docs.vagrantup.com/v2/virtualbox/index.html)
 - [Parallels](https://github.com/Parallels/vagrant-parallels)
 
+*Note*: People have [reported issues](https://github.com/timsutton/osx-vm-templates/issues/72) using VirtualBox as of version 5.1.x. The 5.0.x releases seem to still work.
+
 It's possible to build a machine with different admin account settings, and without the vagrant ssh keys, for use with other systems, e.g. continuous integration.
 
 Use with the Fusion provider requires Vagrant 1.3.0, and use with the VirtualBox provider Vagrant 1.6.3 if using the Rsync file sync mechanism. Note that the VeeWee template also does not have any VirtualBox or Parallels support.
 
 Provisioning steps that are defined in the template via items in the [scripts](https://github.com/timsutton/osx-vm-templates/tree/master/scripts) directory:
-- [Vagrant-specific configuration](http://docs.vagrantup.com/v2/boxes/base.html)
+- [Vagrant-specific configuration](https://www.vagrantup.com/docs/boxes/base.html)
 - VM guest tools installation if on VMware
 - Xcode CLI tools installation
-- Chef installation via the [Chef client installer for OS X](https://www.getchef.com/download-chef-client)
-- Puppet installation via [Puppetlabs Mac installers](https://downloads.puppetlabs.com/mac) - no configuration for Puppet 4 yet, coming soon
+- Chef installation via the [Chef Omnitruck method](https://docs.chef.io/install_omnibus.html)
+- Puppet installation via [Puppetlabs Mac installers](https://downloads.puppetlabs.com/mac), both legacy and 4
+- Disk shrinking for VMware
 
 ## Supported guest OS versions
 
-Currently this prepare script and template supports all versions of OS X that are distributed through the App Store: OS X Lion (10.7) through El Capitan (10.11).
+Currently this prepare script and template supports all versions of OS X that are distributed through the App Store: OS X Lion (10.7) through El Capitan (10.11), and macOS Sierra (10.12).
 
 This project currently only supplies a single Packer template (`template.json`), so the hypervisor's configured guest OS version (i.e. `darwin12-64`) does not accurately reflect the actual installed OS. I haven't found there to be any functional differences depending on these configured guest versions.
 
@@ -111,7 +114,7 @@ This was easily made possible thanks to Per Olofsson's [CreateUserPkg](http://ma
 
 ## Configuration management
 
-By default, the packer template does not install the Chef or Puppet configuration management tools. You can enable the installation of configuration management by setting the `chef_version`, `puppet_version`, `facter_version`, and `hiera_version` variables to `latest`, or to a specific version.
+By default, the packer template does not install the Chef or Puppet configuration management tools. You can enable the installation of configuration management by setting the `chef_version`, `puppet_agent_version`, `puppet_version`, `facter_version`, and `hiera_version` variables to `latest`, or to a specific version.
 
 To install the latest version of Chef:
 
@@ -119,7 +122,13 @@ To install the latest version of Chef:
 packer build -var chef_version=latest template.json
 ```
 
-To install the latest versions of Puppet, Facter and Hiera:
+To install the last version of Puppet Agent:
+
+```
+packer build -var pupet_agent_version=latest template.json
+```
+
+To install the last versions of the deprecated standalone Puppet, Facter and Hiera packages:
 
 ```
 packer build -var puppet_version=latest facter_version=latest hiera_version=latest template.json

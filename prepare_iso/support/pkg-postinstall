@@ -56,6 +56,7 @@ mkdir -p "$3/Users/$USER/Library/Preferences"
 # Suppress annoying iCloud welcome on a GUI login
 $PlistBuddy -c 'Add :DidSeeCloudSetup bool true' "$3/Users/$USER/Library/Preferences/com.apple.SetupAssistant.plist"
 $PlistBuddy -c 'Add :LastSeenCloudProductVersion string 10.'"$OSX_VERS" "$3/Users/$USER/Library/Preferences/com.apple.SetupAssistant.plist"
+$PlistBuddy -c 'Add :DidSeeSiriSetup bool true' "$3/Users/$USER/Library/Preferences/com.apple.SetupAssistant.plist"
 
 # Fix ownership now that the above has made a Library folder as root
 chown -R "$USER_UID":20 "$3/Users/$USER"
