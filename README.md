@@ -28,6 +28,14 @@ This project currently only supplies a single Packer template (`template.json`),
 
 To build a VMware box of an OS version less than El Capitan (10.11), note that as of VMare Fusion 8.5.4, you will need to change the `tools_upload_flavor` from `darwin` to `darwinPre15`.
 
+## Issue with 10.12.4
+
+**Important note:** The Sierra 10.12.4 installer seems to no longer support including custom packages as part of the installer, unless they are signed by Apple. This produces an error with the text, "macOS could not be installed on your computer.. The package veewee-config.pkg is not signed."
+
+The `prepare_iso.sh` script in this repo makes use of functionality Apple supports as part of a [NetInstall workflow](https://help.apple.com/systemimageutility/mac/10.12/#/sysmb1457f0b), but because of this (undocumented) additional requirement of additional packages needing to be signed by Apple as of 10.12.4, these tools can't currently install the necessary configuration for Packer to log in to perform additional configuration, installing guest tools, etc. The rest of the OS install still completes successfully.
+
+It may be possible to work around this by modifying the rc script directly with the contents of our postinstall script.
+
 ## Preparing the ISO
 
 OS X's installer cannot be bootstrapped as easily as can Linux or Windows, and so exists the [prepare_iso.sh](https://github.com/timsutton/osx-vm-templates/blob/master/prepare_iso/prepare_iso.sh) script to perform modifications to it that will allow for an automated install and ultimately allow Packer and later, Vagrant, to have SSH access.
