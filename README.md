@@ -8,8 +8,6 @@ The machine built by this Packer template defaults to being configured for use w
 - Vagrant's included [VirtualBox provider](http://docs.vagrantup.com/v2/virtualbox/index.html)
 - [Parallels](https://github.com/Parallels/vagrant-parallels)
 
-*Note*: People have [reported issues](https://github.com/timsutton/osx-vm-templates/issues/72) using VirtualBox as of version 5.1.x. The 5.0.x releases seem to still work.
-
 It's possible to build a machine with different admin account settings, and without the vagrant ssh keys, for use with other systems, e.g. continuous integration.
 
 Use with the Fusion provider requires Vagrant 1.3.0, and use with the VirtualBox provider Vagrant 1.6.3 if using the Rsync file sync mechanism. Note that the VeeWee template also does not have any VirtualBox or Parallels support.
@@ -172,15 +170,6 @@ The default `prepare_iso.sh` configuration enables Remote Management during inst
 sudo ./prepare_iso/prepare_iso.sh -D DISABLE_REMOTE_MANAGEMENT "/Applications/Install OS X El Capitan.app" out
 ```
 
-#### Extension Pack
-
-The VirtualBox Extension Pack, available from the [Download VirtualBox](https://www.virtualbox.org/wiki/Downloads) page or as the [Homebrew cask](http://caskroom.io/) [virtualbox-extension-pack](https://github.com/caskroom/homebrew-cask/blob/master/Casks/virtualbox-extension-pack.rb), is now required by default because we enable EHCI (USB 2.0) support like the default VirtualBox OS X template does.
-
-If you cannot use the Extension Pack, you can remove the line that enables EHCI support from [`packer/template.json`](https://github.com/timsutton/osx-vm-templates/blob/master/packer/template.json):
-
-```
-        ["modifyvm", "{{.Name}}", "--usbehci", "on"],
-```
 
 #### Shared folders
 
