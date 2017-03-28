@@ -26,6 +26,8 @@ Currently this prepare script and template supports all versions of OS X that ar
 
 This project currently only supplies a single Packer template (`template.json`), so the hypervisor's configured guest OS version (i.e. `darwin12-64`) does not accurately reflect the actual installed OS. I haven't found there to be any functional differences depending on these configured guest versions.
 
+To build a VMware box of an OS version less than El Capitan (10.11), note that as of VMare Fusion 8.5.4, you will need to change the `tools_upload_flavor` from `darwin` to `darwinPre15`.
+
 ## Preparing the ISO
 
 OS X's installer cannot be bootstrapped as easily as can Linux or Windows, and so exists the [prepare_iso.sh](https://github.com/timsutton/osx-vm-templates/blob/master/prepare_iso/prepare_iso.sh) script to perform modifications to it that will allow for an automated install and ultimately allow Packer and later, Vagrant, to have SSH access.
