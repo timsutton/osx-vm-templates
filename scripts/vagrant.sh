@@ -3,7 +3,7 @@ date > /etc/box_build_time
 OSX_VERS=$(sw_vers -productVersion | awk -F "." '{print $2}')
 
 # Set computer/hostname
-COMPNAME=osx-10_${OSX_VERS}
+COMPNAME=macos-10-${OSX_VERS}
 scutil --set ComputerName ${COMPNAME}
 scutil --set HostName ${COMPNAME}.vagrantup.com
 
