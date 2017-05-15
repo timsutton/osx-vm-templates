@@ -102,6 +102,15 @@ packer build \
   template.json
 ```
 
+### Building to a device with more space
+
+Local VM builds take up a lot of space. It's possible to make packer work in different directories.
+
+* [`PACKER_CACHE_DIR`](https://www.packer.io/docs/other/environment-variables.html#packer_cache_dir) is an out-of-the-box environment variable that configures where it will cache ISOs etc.
+* `PACKER_OUTPUT_DIR`: configure where packer will build artifacts (like OVF files) to
+* `PACKER_VAGRANT_BOX_DIR`: configure where packer will build vagrant boxes via the post-processor to.
+
+**Note:** don't make `PACKER_OUTPUT_DIR` and `PACKER_VAGRANT_BOX_DIR` the same place. `keep_input_artifacts` in the post-processor defaults to `false`, and it removes them by removing the directory, not the individual files. So if you use the same place, you'll end up with no output at all (packer `v1.0.0`).
 
 ## Automated installs on OS X
 
