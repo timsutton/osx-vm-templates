@@ -6,6 +6,7 @@
       "guest_os_type": "win-8",
       "iso_checksum_type": "none",
       "iso_url": "{{user `iso_url`}}",
+      "output_directory": "{{user `output_directory`}}",
       "shutdown_command": "echo '{{user `username`}}'|sudo -S shutdown -h now",
       "ssh_port": 22,
       "ssh_username": "{{user `username`}}",
@@ -32,6 +33,7 @@
       "guest_os_type": "darwin12-64",
       "iso_checksum_type": "none",
       "iso_url": "{{user `iso_url`}}",
+      "output_directory": "{{user `output_directory`}}",
       "shutdown_command": "echo '{{user `username`}}'|sudo -S shutdown -h now",
       "skip_compaction": true,
       "ssh_port": 22,
@@ -62,6 +64,7 @@
       "iso_checksum_type": "none",
       "iso_interface": "sata",
       "iso_url": "{{user `iso_url`}}",
+      "output_directory": "{{user `output_directory`}}",
       "shutdown_command": "echo '{{user `username`}}'|sudo -S shutdown -h now",
       "ssh_port": 22,
       "ssh_username": "{{user `username`}}",
@@ -85,7 +88,10 @@
   ],
   "min_packer_version": "0.7.0",
   "post-processors": [
-    "vagrant"
+    {
+      "type": "vagrant",
+      "output": "{{user `vagrant_box_directory`}}/packer_{{.BuildName}}_{{.Provider}}.box"
+    }
   ],
   "provisioners": [
     {
@@ -136,11 +142,13 @@
     "install_vagrant_keys": "true",
     "install_xcode_cli_tools": "true",
     "iso_url": "OSX_InstallESD_10.11.1_15B42.dmg",
+    "output_directory": "{{env `PACKER_OUTPUT_DIR`}}",
     "password": "vagrant",
     "provisioning_delay": "0",
     "puppet_version": "none",
     "puppet_agent_version": "none",
     "update_system": "true",
-    "username": "vagrant"
+    "username": "vagrant",
+    "vagrant_box_directory": "{{env `PACKER_VAGRANT_BOX_DIR`}}"
   }
 }
