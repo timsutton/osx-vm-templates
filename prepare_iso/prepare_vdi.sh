@@ -45,6 +45,9 @@ Optional switches:
   -i <path to image>
     Sets the path of the avatar image for the root user, defaulting to the vagrant icon.
 
+  -o <name of the disk image>
+    Sets the name of the generated virtual disk image, defaulting to macOS_[osversion].vdi.
+
   -D <flag>
     Sets the specified flag. Valid flags are:
       DISABLE_REMOTE_MANAGEMENT
@@ -55,13 +58,13 @@ EOF
 }
 
 cleanup() {
-    hdiutil detach -quiet -force "$MNT_ESD" || echo > /dev/null
-    hdiutil detach -quiet -force "$MNT_BASE_SYSTEM" || echo > /dev/null
+	hdiutil detach -quiet -force "$MNT_ESD" || echo > /dev/null
+	hdiutil detach -quiet -force "$MNT_BASE_SYSTEM" || echo > /dev/null
 
-    if [ ! -z "$TEST" ]; then
-      cp "$BASE_SYSTEM_DMG_RW_SPARSE" "$BASE_SYSTEM_DMG_RW_SPARSE.back"
-    fi
-    rm -rf "$MNT_ESD" "$MNT_BASE_SYSTEM" "$BASE_SYSTEM_DMG_RW" "${BASE_SYSTEM_DMG_RW%%.dmg}" "$BASE_SYSTEM_DMG_RW_SPARSE"
+	if [ ! -z "$TEST" ]; then
+		cp "$BASE_SYSTEM_DMG_RW_SPARSE" "$BASE_SYSTEM_DMG_RW_SPARSE.back"
+	fi
+	rm -rf "$MNT_ESD" "$MNT_BASE_SYSTEM" "$BASE_SYSTEM_DMG_RW" "${BASE_SYSTEM_DMG_RW%%.dmg}" "$BASE_SYSTEM_DMG_RW_SPARSE"
 }
 
 trap cleanup EXIT INT TERM
@@ -75,7 +78,7 @@ msg_error() {
 }
 
 render_template() {
-  eval "echo \"$(cat "$1")\""
+	eval "echo \"$(cat "$1")\""
 }
 
 if [ $# -eq 0 ]; then
@@ -96,7 +99,7 @@ DISABLE_REMOTE_MANAGEMENT=0
 DISABLE_SCREEN_SHARING=0
 DISABLE_SIP=0
 
-while getopts u:p:i:D: OPT; do
+while getopts u:p:i:o:D: OPT; do
   case "$OPT" in
     u)
       USER="$OPTARG"
@@ -106,6 +109,9 @@ while getopts u:p:i:D: OPT; do
       ;;
     i)
       IMAGE_PATH="$OPTARG"
+      ;;
+    o)
+      OUTPUT_DMG="$OPTARG"
       ;;
     D)
       if [ x${!OPTARG} = x0 ]; then
@@ -204,7 +210,10 @@ msg_status "OS X version detected: 10.$DMG_OS_VERS_MAJOR.$DMG_OS_VERS_MINOR, bui
 msg_status "Unmounting BaseSystem.."
 hdiutil detach "$MNT_BASE_SYSTEM"
 
-OUTPUT_DMG="$OUT_DIR/macOS_${DMG_OS_VERS}_${DMG_OS_BUILD}.vdi"
+if [ -z "$OUTPUT_DMG" ]; then
+  OUTPUT_DMG="$OUT_DIR/macOS_${DMG_OS_VERS}_${DMG_OS_BUILD}.vdi"
+fi
+
 if [ -e "$OUTPUT_DMG" ]; then
 	msg_error "Output file $OUTPUT_DMG already exists! We're not going to overwrite it, exiting.."
 	hdiutil detach -force "$MNT_ESD"
