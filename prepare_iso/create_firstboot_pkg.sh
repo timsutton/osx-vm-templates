@@ -13,11 +13,16 @@ DISABLE_REMOTE_MANAGEMENT=0
 DISABLE_SCREEN_SHARING=0
 DISABLE_SIP=0
 
+render_template() {
+  eval "echo \"$(cat "$1")\""
+}
+
 create_firstboot_pkg() {
   # payload items
   mkdir -p "$SUPPORT_DIR/pkgroot/private/var/db/dslocal/nodes/Default/users"
   mkdir -p "$SUPPORT_DIR/pkgroot/private/var/db/shadow/hash"
   BASE64_IMAGE=$(openssl base64 -in "$IMAGE_PATH")
+  ShadowHashData=$($SCRIPT_DIR/../scripts/support/generatehash.py "$PASSWORD")
   # Replace USER and BASE64_IMAGE in the user.plist file with the actual user and image
   render_template "$SUPPORT_DIR/user.plist" > "$SUPPORT_DIR/pkgroot/private/var/db/dslocal/nodes/Default/users/$USER.plist"
   USER_GUID=$(/usr/libexec/PlistBuddy -c 'Print :generateduid:0' "$SUPPORT_DIR/user.plist")
