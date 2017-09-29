@@ -74,10 +74,6 @@ msg_error() {
 	echo "\033[0;31m-- $1\033[0m"
 }
 
-render_template() {
-  eval "echo \"$(cat "$1")\""
-}
-
 if [ $# -eq 0 ]; then
 	usage
 	exit 1
@@ -85,6 +81,10 @@ fi
 
 SCRIPT_DIR="$(cd "$(dirname "$0")"; pwd)"
 SUPPORT_DIR="$SCRIPT_DIR/support"
+
+# Import shared code to generate first boot pkgs
+FIRST_BOOT_PKG_SCRIPT="$SCRIPT_DIR/create_firstboot_pkg.sh"
+[ -f "$FIRST_BOOT_PKG_SCRIPT" ] && . "$FIRST_BOOT_PKG_SCRIPT"
 
 # Parse the optional command line switches
 USER="vagrant"
@@ -217,40 +217,11 @@ fi
 
 # Build our post-installation pkg that will create a user and enable ssh
 msg_status "Making firstboot installer pkg.."
-
-# payload items
-mkdir -p "$SUPPORT_DIR/pkgroot/private/var/db/dslocal/nodes/Default/users"
-mkdir -p "$SUPPORT_DIR/pkgroot/private/var/db/shadow/hash"
-BASE64_IMAGE=$(openssl base64 -in "$IMAGE_PATH")
-# Replace USER and BASE64_IMAGE in the user.plist file with the actual user and image
-render_template "$SUPPORT_DIR/user.plist" > "$SUPPORT_DIR/pkgroot/private/var/db/dslocal/nodes/Default/users/$USER.plist"
-USER_GUID=$(/usr/libexec/PlistBuddy -c 'Print :generateduid:0' "$SUPPORT_DIR/user.plist")
-# Generate a shadowhash from the supplied password
-"$SUPPORT_DIR/generate_shadowhash" "$PASSWORD" > "$SUPPORT_DIR/pkgroot/private/var/db/shadow/hash/$USER_GUID"
-
-# postinstall script
-mkdir -p "$SUPPORT_DIR/tmp/Scripts"
-cat "$SUPPORT_DIR/pkg-postinstall" \
-    | sed -e "s/__USER__PLACEHOLDER__/${USER}/" \
-    | sed -e "s/__DISABLE_REMOTE_MANAGEMENT__/${DISABLE_REMOTE_MANAGEMENT}/" \
-    | sed -e "s/__DISABLE_SCREEN_SHARING__/${DISABLE_SCREEN_SHARING}/" \
-    | sed -e "s/__DISABLE_SIP__/${DISABLE_SIP}/" \
-    > "$SUPPORT_DIR/tmp/Scripts/postinstall"
-chmod a+x "$SUPPORT_DIR/tmp/Scripts/postinstall"
-
-# build it
-BUILT_COMPONENT_PKG="$SUPPORT_DIR/tmp/veewee-config-component.pkg"
-BUILT_PKG="$SUPPORT_DIR/tmp/veewee-config.pkg"
-pkgbuild --quiet \
-	--root "$SUPPORT_DIR/pkgroot" \
-	--scripts "$SUPPORT_DIR/tmp/Scripts" \
-	--identifier com.vagrantup.veewee-config \
-	--version 0.1 \
-	"$BUILT_COMPONENT_PKG"
-productbuild \
-	--package "$BUILT_COMPONENT_PKG" \
-	"$BUILT_PKG"
-rm -rf "$SUPPORT_DIR/pkgroot"
+create_firstboot_pkg
+if [ -z "$BUILT_PKG" ] || [ ! -e "$BUILT_PKG" ]; then
+  msg_error "Failed building the firstboot installer pkg, exiting.."
+  exit 1
+fi
 
 # We'd previously mounted this to check versions
 hdiutil detach "$MNT_BASE_SYSTEM"
