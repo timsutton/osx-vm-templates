@@ -241,6 +241,28 @@ packer build \
   template.json
 ```
 
+### Parallels support via ```prepare_vdi.sh```, ```prepare_pvm.sh``` and packer parallels-pvm
+
+This approach requires VirtualBox and Parallels Desktop.
+
+#### Installing and exporting to a VirtualBox virtual disk image
+
+The ```prepare_vdi.sh``` command will run the installer's ```OSInstall.pkg``` or ```InstallInfo.plist``` creating a fresh install in a temporary disk image which is converted into a VDI disk image.
+
+#### Generating a Parallels virtual machine
+The ```prepare_pvm.sh``` script converts a virtual disk image into Parallels's hard disk (.hdd) and creates a Parallels virtual machine (.pvm) with that disk attached.
+
+#### Generating a packer box using the parallels-pvm builder
+
+Finally, the parallels-pvm builder allows to use the previously generated virtual machine to generate the provisioned packer box.
+
+```
+packer build \
+  -only parallels-pvm \
+  -var source_path=macOS_10.13.pvm \
+  template.json
+```
+
 ## Box sizes
 
 A built box with CLI tools, Puppet and Chef is over 5GB in size. It might be advisable to remove (with care) some unwanted applications in an additional postinstall script. It should also be possible to modify the OS X installer package to install fewer components, but this is non-trivial. One can also supply a custom "choice changes XML" file to modify the installer choices in a supported way, but from my testing, this only allows removing several auxiliary packages that make up no more than 6-8% of the installed footprint (for example, multilingual voices and dictionary files).
