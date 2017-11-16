@@ -36,6 +36,8 @@ The `prepare_iso.sh` script in this repo makes use of functionality Apple suppor
 
 It may be possible to work around this by modifying the rc script directly with the contents of our postinstall script.
 
+The `prepare_vdi.sh` script uses [AutoDMG](https://github.com/MagerValp/AutoDMG)'s approach running the installer's ```OSInstall.pkg``` creating a fresh install in a temporary DMG sparse disk image which is converted into a VDI disk image using VirtualBox's command line tools.
+
 ## Preparing the ISO
 
 OS X's installer cannot be bootstrapped as easily as can Linux or Windows, and so exists the [prepare_iso.sh](https://github.com/timsutton/osx-vm-templates/blob/master/prepare_iso/prepare_iso.sh) script to perform modifications to it that will allow for an automated install and ultimately allow Packer and later, Vagrant, to have SSH access.
@@ -202,6 +204,42 @@ Vagrant.configure("2") do |config|
 end
 ```
 
+## Alternative method using ```prepare_vdi.sh```, ```prepare_ovf.sh``` and packer virtualbox-ovf
+
+This approach requires VirtualBox and unfortunately almost 30GB of free space.
+
+#### Installing and exporting to a VirtualBox virtual disk image.
+
+The ```prepare_vdi.sh``` command will run the installer's ```OSInstall.pkg``` creating a fresh install in a temporary disk image which is converted into a VDI disk image.
+
+```
+cd packer
+sudo ../prepare_iso/prepare_vdi.sh \
+  -D DISABLE_REMOTE_MANAGEMENT \
+  -o macOS_10.12.vdi \
+   /Applications/Install\ macOS\ Sierra.app/ \
+  .
+```
+
+#### Generating a VirtualBox machine and exporting it into packed virtual machine OVF
+
+The ```prepare_ovf.sh``` command takes a virtual image disk and adds it into a temporary VirtualBox machine which is exported into a packed virtual machine using the OVF (Open Virtualization Format).
+
+```
+../prepare_iso/prepare_ovf.sh \
+  macOS_10.12.vdi
+```
+
+#### Generating a packer box using the virtualbox-ovf builder
+
+Finally the virtualbox-ovf allows to use the previously generated exported virtual machine to generate the provisioned packer box.
+
+```
+packer build \
+  -var provisioning_delay=30 \
+  -var source_path=macOS_10.12.ovf \
+  template.json
+```
 
 ## Box sizes
 

@@ -4,7 +4,13 @@
 <dict>
 	<key>authentication_authority</key>
 	<array>
-		<string>;ShadowHash;</string>
+		<string>;ShadowHash;HASHLIST:&lt;SALTED-SHA512-PBKDF2&gt;</string>
+	</array>
+	<key>ShadowHashData</key>
+	<array>
+			<data>
+			${ShadowHashData}
+			</data>
 	</array>
 	<key>generateduid</key>
 	<array>

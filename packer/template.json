@@ -84,6 +84,27 @@
         ["modifyvm", "{{.Name}}", "--vram", "128"],
         ["storagectl", "{{.Name}}", "--name", "IDE Controller", "--remove"]
       ]
+    },
+    {
+      "boot_wait": "2s",
+      "guest_additions_mode": "disable",
+      "source_path": "{{user `source_path`}}",
+      "shutdown_command": "echo '{{user `username`}}'|sudo -S shutdown -h now",
+      "ssh_port": 22,
+      "ssh_username": "{{user `username`}}",
+      "ssh_password": "{{user `password`}}",
+      "ssh_wait_timeout": "10000s",
+      "type": "virtualbox-ovf",
+      "vboxmanage": [
+        ["modifyvm", "{{.Name}}", "--audiocontroller", "hda"],
+        ["modifyvm", "{{.Name}}", "--chipset", "ich9"],
+        ["modifyvm", "{{.Name}}", "--firmware", "efi"],
+        ["modifyvm", "{{.Name}}", "--hpet", "on"],
+        ["modifyvm", "{{.Name}}", "--keyboard", "usb"],
+        ["modifyvm", "{{.Name}}", "--memory", "4096"],
+        ["modifyvm", "{{.Name}}", "--mouse", "usbtablet"],
+        ["modifyvm", "{{.Name}}", "--vram", "128"]
+      ]
     }
   ],
   "min_packer_version": "0.7.0",
