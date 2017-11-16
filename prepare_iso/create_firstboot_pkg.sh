@@ -1,6 +1,12 @@
 #!/bin/bash
 
-SCRIPT_DIR="$(cd "$(dirname "$0")"; pwd)"
+# Handle the possibility of being sourced from outside this project dir
+called=$_
+if [[ $called != "${0}" ]]; then
+  SCRIPT_DIR="$(dirname "${BASH_SOURCE[0]}")"
+else
+  SCRIPT_DIR="$(cd "$(dirname "$0")" || exit; pwd)"
+fi
 SUPPORT_DIR="$SCRIPT_DIR/support"
 
 # Parse the optional command line switches
