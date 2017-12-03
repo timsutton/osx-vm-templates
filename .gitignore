@@ -6,3 +6,9 @@ AutoPartition-*
 packer/output-*
 *.pvm
 *.pyc
+*.vdi
+*.md5
+*.vmdk
+*.ovf
+**/*/tmp
+.vscode
