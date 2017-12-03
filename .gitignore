@@ -12,3 +12,6 @@ packer/output-*
 *.ovf
 **/*/tmp
 .vscode
+*.dump
+*.hdd
+*.vhd

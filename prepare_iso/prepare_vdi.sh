@@ -30,7 +30,7 @@ $(basename "$0") [-upiD] "/path/to/Install OS X [Name].app" /path/to/output/dire
 
 Description:
 Creates and install OS X into a virtual disk image. The virtual disk image will be
-named 'macOS_[osversion].vdi.'
+named 'macOS_[osversion].vhd.'
 
 Optional switches:
   -u <user>
@@ -43,7 +43,7 @@ Optional switches:
     Sets the path of the avatar image for the root user, defaulting to the vagrant icon.
 
   -o <name of the disk image>
-    Sets the name of the generated virtual disk image, defaulting to macOS_[osversion].vdi.
+    Sets the name of the generated virtual disk image, defaulting to macOS_[osversion].vhd.
 
   -D <flag>
     Sets the specified flag. Valid flags are:
@@ -182,11 +182,11 @@ HOST_OS_VERS_PATCH=$(echo $HOST_OS_VERS | awk -F "." '{print $3}')
 msg_status "host macOS version detected: $HOST_OS_VERS_MAJOR.$HOST_OS_VERS_MINOR.$HOST_OS_VERS_PATCH"
 
 if [ "$DMG_OS_VERS_MAJOR" != "$DMG_OS_VERS_MAJOR" ] || [ "$DMG_OS_VERS_MINOR" != "$HOST_OS_VERS_MINOR" ]; then
-	exit_with_error "Unfortunately prepare_vdi can only generate images of same version as the host"
+	exit_with_error "Unfortunately prepare_vhd can only generate images of same version as the host"
 fi
 
 if [ -z "$OUTPUT_DMG" ]; then
-  OUTPUT_DMG="$OUT_DIR/macOS_${DMG_OS_VERS}.vdi"
+  OUTPUT_DMG="$OUT_DIR/macOS_${DMG_OS_VERS}.vhd"
 elif [ -e "$OUTPUT_DMG" ]; then
   exit_with_error "Output file $OUTPUT_DMG already exists! We're not going to overwrite it, exiting.."
 fi
@@ -219,8 +219,8 @@ if [ -z "$BUILT_PKG" ] || [ ! -e "$BUILT_PKG" ]; then
   exit_with_error "Failed building the firstboot installer pkg, exiting.."
 fi
 
-MNT_SPARSEIMAGE=$(/usr/bin/mktemp -d /tmp/prepare_vdi_mnt_sparseimage.XXXX)
-SPARSEIMAGE="$(/usr/bin/mktemp /tmp/prepare_vdi.XXXX).sparseimage"
+MNT_SPARSEIMAGE=$(/usr/bin/mktemp -d /tmp/prepare_vhd.XXXX)
+SPARSEIMAGE="$(/usr/bin/mktemp /tmp/prepare_vhd.XXXX).sparseimage"
 
 msg_status "Creating DMG of "${DISK_SIZE_GB}g" with $FSTYPE located at $SPARSEIMAGE.."
 if ! hdiutil create -size "${DISK_SIZE_GB}g" -type SPARSE -fs "$FSTYPE" -volname "Macintosh HD" -uid 0 -gid 80 -mode 1775 "$SPARSEIMAGE"; then
@@ -254,7 +254,7 @@ if [ ! -e "$DISK_DEV" ]; then
 fi
 
 msg_status "Exporting from $DISK_DEV to $OUTPUT_DMG"
-VBoxManage convertfromraw stdin "$OUTPUT_DMG" "$DISK_SIZE_BYTES" < "$DISK_DEV"
+VBoxManage convertfromraw stdin "$OUTPUT_DMG" "$DISK_SIZE_BYTES" < "$DISK_DEV" --format VHD
 
 msg_status "Checksumming output image.."
 MD5=$(md5 -q "$OUTPUT_DMG" | tee "$OUTPUT_DMG.md5")
