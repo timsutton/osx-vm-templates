@@ -70,5 +70,3 @@ msg_status "Building Vagrant box from Parallels pvm"
 packer validate -var-file=parallels-packer.json -var "source_path=${OUTPUT_PVM}" template.json
 packer build -var-file=parallels-packer.json -var "source_path=${OUTPUT_PVM}" -only=parallels-pvm template.json
 
-msg_status "Moving bundle to $PACKER_DIR directory"
-prlctl move "$VM" --dst $PACKER_DIR
