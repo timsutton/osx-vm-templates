@@ -111,7 +111,7 @@
     },
     {
       "boot_wait": "2s",
-      "parallels_tools_flavor": "disable",
+      "parallels_tools_flavor": "mac",
       "source_path": "{{user `source_path`}}",
       "shutdown_command": "echo '{{user `username`}}'|sudo -S shutdown -h now",
       "ssh_port": 22,
