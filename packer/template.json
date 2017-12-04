@@ -108,6 +108,22 @@
         ["modifyvm", "{{.Name}}", "--mouse", "usbtablet"],
         ["modifyvm", "{{.Name}}", "--vram", "128"]
       ]
+    },
+    {
+      "boot_wait": "2s",
+      "parallels_tools_flavor": "disable",
+      "source_path": "{{user `source_path`}}",
+      "shutdown_command": "echo '{{user `username`}}'|sudo -S shutdown -h now",
+      "ssh_port": 22,
+      "ssh_username": "{{user `username`}}",
+      "ssh_password": "{{user `password`}}",
+      "ssh_wait_timeout": "10000s",
+      "type": "parallels-pvm",
+      "prlctl": [
+        ["set", "{{.Name}}", "--cpus", "2"],
+        ["set", "{{.Name}}", "--memsize", "4096"],
+        ["set", "{{.Name}}", "--efi-boot", "on"]
+      ]
     }
   ],
   "min_packer_version": "0.7.0",
