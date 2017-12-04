@@ -6,19 +6,19 @@ Usage:
 $(basename "$0") "/path/to/diskimage.vhd"
 
 Description:
-Creates and exports a Parallels machine image (PVM) from virtual disk image
+Creates and exports a Parallels virtual machine (PVM) from a virtual disk image
 
 EOF
 }
 
-# cleanup() {
-#   if [ -n "$VM" ] && prlctl list --all | grep -q "$VM"; then
-#     prlctl stop "$VM"
-#     prlctl delete "$VM"
-#   fi
-# }
+cleanup() {
+  if [ -n "$VM" ] && prlctl list --all | grep -q "$VM"; then
+    prlctl stop "$VM"
+    prlctl unregister "$VM"
+  fi
+}
 
-# trap cleanup EXIT INT TERM
+trap cleanup EXIT INT TERM
 
 msg_status() {
 	echo "\033[0;32m-- $1\033[0m"
@@ -37,10 +37,14 @@ if [ ! -f "$1" ]; then
 	exit 1
 fi
 
+
 TIMESTAMP=$(date +"%s")
 VM="macOS_${TIMESTAMP}"
 HARDDRIVE="$1"
-OUTPUT_PVM="${HOME}/Parallels/${VM}.pvm"
+#OUTPUT_PVM="${HOME}/Parallels/${VM}.pvm"
+OUTPUT_PVM=$(/usr/bin/mktemp -d /tmp/prepared_pvm.XXXX)
+PARALLELS_HDD="${OUTPUT_PVM}/${HARDDRIVE%.vhd}.hdd"
+PACKER_DIR="$(cd "$(dirname "$0")"; pwd)/../packer"
 
 msg_status "Creating new Parallels virtual machine"
 prlctl create "$VM" --distribution macosx --no-hdd
@@ -49,9 +53,16 @@ msg_status "Converting $HARDDRIVE to $OUTPUT_PVM"
 prl_convert "$HARDDRIVE" --allow-no-os --no-reconfig --reg --dst="${OUTPUT_PVM}"
 
 msg_status "Adding SATA Controller and attaching hdd"
-prlctl set "$VM" --device-add hdd --image "${OUTPUT_PVM}/${HARDDRIVE%.vhd}.hdd" --iface sata --position 0
+prlctl set "$VM" --device-add hdd --image "$PARALLELS_HDD" --iface sata --position 0
 
 msg_status "Setting up Parallels virtual machine"
 prlctl set "$VM" --efi-boot "on"
 prlctl set "$VM" --cpus "2"
 prlctl set "$VM" --memsize "4096"
+
+msg_status "Optimizing Parallels HDD"
+prl_disk_tool convert --hdd "$PARALLELS_HDD" --merge
+prl_disk_tool compact --hdd "$PARALLELS_HDD" --exclude-pagefile
+
+msg_status "Moving bundle to $PACKER_DIR directory"
+prlctl move "$VM" --dst $PACKER_DIR
