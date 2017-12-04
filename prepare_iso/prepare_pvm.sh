@@ -13,7 +13,6 @@ EOF
 
 cleanup() {
   if [ -n "$VM" ] && prlctl list --all | grep -q "$VM"; then
-    prlctl stop "$VM"
     prlctl unregister "$VM"
   fi
 }
@@ -39,17 +38,18 @@ fi
 
 
 TIMESTAMP=$(date +"%s")
-VM="macOS_${TIMESTAMP}"
 HARDDRIVE="$1"
+VM="${HARDDRIVE%.vhd}"
 #OUTPUT_PVM="${HOME}/Parallels/${VM}.pvm"
-OUTPUT_PVM=$(/usr/bin/mktemp -d /tmp/prepared_pvm.XXXX)
+TEMP_PVM=$(/usr/bin/mktemp -d /tmp/prepared_pvm.XXXX)
+OUTPUT_PVM="${TEMP_PVM}/${VM}.pvm"
 PARALLELS_HDD="${OUTPUT_PVM}/${HARDDRIVE%.vhd}.hdd"
 PACKER_DIR="$(cd "$(dirname "$0")"; pwd)/../packer"
 
 msg_status "Creating new Parallels virtual machine"
-prlctl create "$VM" --distribution macosx --no-hdd
+prlctl create "$VM" --distribution macosx --no-hdd --dst="${TEMP_PVM}"
 
-msg_status "Converting $HARDDRIVE to $OUTPUT_PVM"
+msg_status "Converting $HARDDRIVE"
 prl_convert "$HARDDRIVE" --allow-no-os --no-reconfig --reg --dst="${OUTPUT_PVM}"
 
 msg_status "Adding SATA Controller and attaching hdd"
@@ -60,9 +60,15 @@ prlctl set "$VM" --efi-boot "on"
 prlctl set "$VM" --cpus "2"
 prlctl set "$VM" --memsize "4096"
 
-msg_status "Optimizing Parallels HDD"
+msg_status "Optimizing virtual disk"
 prl_disk_tool convert --hdd "$PARALLELS_HDD" --merge
 prl_disk_tool compact --hdd "$PARALLELS_HDD" --exclude-pagefile
+
+cleanup
+
+msg_status "Building Vagrant box from Parallels pvm"
+packer validate -var-file=parallels-packer.json -var "source_path=${OUTPUT_PVM}" template.json
+packer build -var-file=parallels-packer.json -var "source_path=${OUTPUT_PVM}" -only=parallels-pvm template.json
 
 msg_status "Moving bundle to $PACKER_DIR directory"
 prlctl move "$VM" --dst $PACKER_DIR
