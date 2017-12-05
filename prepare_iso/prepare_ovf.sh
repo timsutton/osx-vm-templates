@@ -3,7 +3,7 @@
 usage() {
 	cat <<EOF
 Usage:
-$(basename "$0") "/path/to/diskimage.vdi"
+$(basename "$0") "/path/to/diskimage.vhd"
 
 Description:
 Creates and exports a machine image (OVF) from virtual disk image
@@ -41,7 +41,7 @@ fi
 TIMESTAMP=$(date +"%s")
 VM="macOS_${TIMESTAMP}"
 HARDDRIVE="$1"
-OUTPUT="${HARDDRIVE%.vdi}.ovf"
+OUTPUT="${HARDDRIVE%.vhd}.ovf"
 
 msg_status "Creating new virtual machine"
 VBoxManage createvm --name "$VM" --ostype "MacOS_64" --register
@@ -49,7 +49,7 @@ VBoxManage createvm --name "$VM" --ostype "MacOS_64" --register
 msg_status "Adding SATA Controller"
 VBoxManage storagectl "$VM" --name "SATA Controller" --add sata --controller IntelAHCI
 
-msg_status "Attaching vdi"
+msg_status "Attaching vhd"
 VBoxManage storageattach "$VM" --storagectl "SATA Controller" --port 0 --device 0 --type hdd --medium "$HARDDRIVE"
 
 msg_status "Setting up virtual machine"

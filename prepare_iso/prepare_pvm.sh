@@ -36,11 +36,9 @@ if [ ! -f "$1" ]; then
 	exit 1
 fi
 
-
 TIMESTAMP=$(date +"%s")
 HARDDRIVE="$1"
 VM="${HARDDRIVE%.vhd}"
-#OUTPUT_PVM="${HOME}/Parallels/${VM}.pvm"
 TEMP_PVM=$(/usr/bin/mktemp -d /tmp/prepared_pvm.XXXX)
 OUTPUT_PVM="${TEMP_PVM}/${VM}.pvm"
 PARALLELS_HDD="${OUTPUT_PVM}/${HARDDRIVE%.vhd}.hdd"
@@ -65,8 +63,3 @@ prl_disk_tool convert --hdd "$PARALLELS_HDD" --merge
 prl_disk_tool compact --hdd "$PARALLELS_HDD" --exclude-pagefile
 
 cleanup
-
-msg_status "Building Vagrant box from Parallels pvm"
-packer validate -var-file=parallels-packer.json -var "source_path=${OUTPUT_PVM}" template.json
-packer build -var-file=parallels-packer.json -var "source_path=${OUTPUT_PVM}" -only=parallels-pvm template.json
-

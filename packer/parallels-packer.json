@@ -1,9 +1,0 @@
-{
-    "chef_version": "latest",
-    "autologin": "true",
-    "iso_url": "macOS_10.13.1.vhd",
-    "iso_checksum_type": "md5",
-    "iso_checksum": "02fae1568da9a8cb59dffffc1f1b7428",
-    "vagrant_box_directory": "./output",
-    "output_directory": "./packer_cache"
-}
