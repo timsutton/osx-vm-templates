@@ -247,7 +247,8 @@ that are available before you begin the build process.
 ### ISO Builders
 
 When using an ISO builder, the checksum does not need to be added because the `iso_checksum_type`
-has been set to "none". However, using the checksum is never a bad idea and is encouraged.
+has been set to "none". However, since ISO files are so big, a checksum is
+highly recommended.
 
 The Packer template adds some additional VM options required for OS X guests. Note
 that the paths given in the Packer template's `iso_url` builder key accepts file

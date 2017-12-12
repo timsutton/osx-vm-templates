@@ -46,14 +46,17 @@ ABS_PARENT="$(dirname ${ABS_PATH})"
 CONVERTED_HDD="${ABS_PATH}/${VM}.hdd"
 PARALLELS_HDD="${ABS_PATH}/Macintosh.hdd"
 
-msg_status "Creating new Parallels virtual machine: ${VM}"
+msg_status "Creating a new Parallels virtual machine: ${VM}"
 prlctl create "$VM" --distribution macosx --no-hdd --dst="${ABS_PARENT}" > /dev/null
 
-msg_status "Converting $HARDDRIVE"
-prl_convert "$HARDDRIVE" --allow-no-os --no-reconfig --reg --dst="${OUTPUT}" > /dev/null
+msg_status "Converting VHD to Parallels format"
+prl_convert "$HARDDRIVE" --dst="${OUTPUT}" --allow-no-os
 mv $CONVERTED_HDD $PARALLELS_HDD
 
-msg_status "Adding SATA Controller and attaching hdd"
+msg_status "Compacting $PARALLELS_HDD"
+prl_disk_tool compact --hdd "$PARALLELS_HDD"
+
+msg_status "Adding SATA Controller and attaching Parallels HDD"
 prlctl set "$VM" --device-add hdd --image "$PARALLELS_HDD" --iface sata --position 0 > /dev/null
 
 msg_status "Setting up Parallels virtual machine"
@@ -61,11 +64,6 @@ prlctl set "$VM" --efi-boot "on" > /dev/null
 prlctl set "$VM" --cpus "2" > /dev/null
 prlctl set "$VM" --memsize "4096" > /dev/null
 
-msg_status "Optimizing virtual disk"
-prl_disk_tool convert --hdd "$PARALLELS_HDD" --merge > /dev/null
-prl_disk_tool compact --hdd "$PARALLELS_HDD" --exclude-pagefile > /dev/null
-
 cleanup
 
 msg_status "Done. Virtual machine export located at $OUTPUT."
-
