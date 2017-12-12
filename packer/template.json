@@ -3,11 +3,10 @@
     {
       "boot_wait": "5s",
       "disk_size": 40960,
-      "guest_os_type": "win-8",
+      "guest_os_type": "macosx",
       "iso_checksum_type": "{{user `iso_checksum_type`}}",
       "iso_checksum": "{{user `iso_checksum`}}",
       "iso_url": "{{user `iso_url`}}",
-      "output_directory": "{{user `output_directory`}}",
       "shutdown_command": "echo '{{user `username`}}' | sudo -S shutdown -h now",
       "ssh_port": 22,
       "ssh_username": "{{user `username`}}",
@@ -15,6 +14,7 @@
       "ssh_wait_timeout": "10000s",
       "parallels_tools_flavor": "mac",
       "type": "parallels-iso",
+      "name": "macos-parallels-iso",
       "prlctl": [
         ["set", "{{.Name}}", "--memsize", "2048"],
         ["set", "{{.Name}}", "--memquota", "512:2048"],
@@ -35,7 +35,6 @@
       "iso_checksum_type": "{{user `iso_checksum_type`}}",
       "iso_checksum": "{{user `iso_checksum`}}",
       "iso_url": "{{user `iso_url`}}",
-      "output_directory": "{{user `output_directory`}}",
       "shutdown_command": "echo '{{user `username`}}' | sudo -S shutdown -h now",
       "skip_compaction": true,
       "ssh_port": 22,
@@ -44,6 +43,7 @@
       "ssh_wait_timeout": "10000s",
       "tools_upload_flavor": "darwin",
       "type": "vmware-iso",
+      "name": "macos-vmware-iso",
       "vmx_data": {
         "cpuid.coresPerSocket": "1",
         "memsize": "2048",
@@ -67,13 +67,13 @@
       "iso_checksum": "{{user `iso_checksum`}}",
       "iso_interface": "sata",
       "iso_url": "{{user `iso_url`}}",
-      "output_directory": "{{user `output_directory`}}",
       "shutdown_command": "echo '{{user `username`}}' | sudo -S shutdown -h now",
       "ssh_port": 22,
       "ssh_username": "{{user `username`}}",
       "ssh_password": "{{user `password`}}",
       "ssh_wait_timeout": "10000s",
       "type": "virtualbox-iso",
+      "name": "macos-virtualbox-iso",
       "vboxmanage": [
         ["modifyvm", "{{.Name}}", "--audiocontroller", "hda"],
         ["modifyvm", "{{.Name}}", "--boot1", "dvd"],
@@ -98,6 +98,7 @@
       "ssh_password": "{{user `password`}}",
       "ssh_wait_timeout": "10000s",
       "type": "virtualbox-ovf",
+      "name": "macos-virtualbox-ovf",
       "vboxmanage": [
         ["modifyvm", "{{.Name}}", "--audiocontroller", "hda"],
         ["modifyvm", "{{.Name}}", "--chipset", "ich9"],
@@ -119,6 +120,7 @@
       "ssh_password": "{{user `password`}}",
       "ssh_wait_timeout": "10000s",
       "type": "parallels-pvm",
+      "name": "macos-parallels-pvm",
       "prlctl": [
         ["set", "{{.Name}}", "--memsize", "2048"],
         ["set", "{{.Name}}", "--memquota", "512:2048"],
@@ -137,8 +139,9 @@
   "min_packer_version": "0.7.0",
   "post-processors": [
     {
+      "compression_level": 9,
       "type": "vagrant",
-      "output": "{{user `vagrant_box_directory`}}/packer_{{.BuildName}}_{{.Provider}}.box"
+      "output": "{{user `vagrant_box_directory`}}/{{.BuildName}}.box"
     }
   ],
   "provisioners": [
@@ -189,16 +192,15 @@
     "hiera_version": "none",
     "install_vagrant_keys": "true",
     "install_xcode_cli_tools": "true",
-    "iso_url": "OSX_InstallESD_10.11.1_15B42.dmg",
+    "iso_url": "none",
     "iso_checksum_type": "none",
     "iso_checksum": "none",
-    "output_directory": "{{env `PACKER_OUTPUT_DIR`}}",
     "password": "vagrant",
     "provisioning_delay": "0",
     "puppet_version": "none",
     "puppet_agent_version": "none",
     "update_system": "true",
     "username": "vagrant",
-    "vagrant_box_directory": "{{env `PACKER_VAGRANT_BOX_DIR`}}"
+    "vagrant_box_directory": "./out"
   }
 }

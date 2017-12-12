@@ -266,7 +266,7 @@ if [ -n "$SUDO_UID" ] && [ -n "$SUDO_GID" ]; then
 		"$OUT_DIR"
 fi
 
-msg_status "Done. Built image is located at $OUTPUT_DMG. Add this iso and its checksum to your template."
+msg_status "Done. Built image is located at $OUTPUT_DMG. Use this vhd to assemble a VM for Packer."
 
 cleanup
 exit 0
