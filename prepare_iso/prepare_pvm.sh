@@ -13,7 +13,7 @@ EOF
 
 cleanup() {
   if [ -n "$VM" ] && prlctl list --all | grep -q "$VM"; then
-    prlctl unregister "$VM"
+    prlctl unregister "$VM" > /dev/null
   fi
 }
 

@@ -214,7 +214,7 @@ was run.
 ```
 
 Where the first argument is VHD file obtained after finishing step one. The result
-of step two would be something like `macOS_1512448228.ovf` in the same directory.
+of step two would be something like `macOS_10.13.1.ovf` in the same directory.
 This is the value of `source_url` in step three.
 
 **Parallels:**
@@ -224,7 +224,7 @@ This is the value of `source_url` in step three.
 ```
 
 Where the first argument is VHD file obtained after finishing step one. The result
-of step two would be something like `macOS_1512448462.pvm` in the same directory.
+of step two would be something like `macOS_10.13.1.ovf` in the same directory.
 
 Move on to the next phase and use the resulting `.ovf` and/or `.pvm` bundles as
 the `source_path` variable for the `virtualbox-ovf` and/or `parallels-pvm`
@@ -258,7 +258,7 @@ Given the example artifact shown earlier, we could run Packer like so:
 ```plain
 $ cd packer
 $ packer build \
-> -var 'iso_url=../out/OSX_InstallESD_10.8.4_12E55.dmg' \
+> -var 'iso_url=./out/OSX_InstallESD_10.8.4_12E55.dmg' \
 > template.json
 ```
 
@@ -272,7 +272,7 @@ the Vagrant SSH keys from being installed for that user. For example:
 
 ```plain
 $ packer build \
-> -var 'iso_url=../out/OSX_InstallESD_10.8.4_12E55.dmg' \
+> -var 'iso_url=./out/OSX_InstallESD_10.8.4_12E55.dmg' \
 > -var 'username=youruser' \
 > -var 'password=yourpassword' \
 > -var 'install_vagrant_keys=false' \
@@ -282,18 +282,18 @@ $ packer build \
 ### VM Builders
 
 Depending which type of VM you build using the VHD, you'll have something
-like `macOS_1512448228.ovf` and/or `macOS_1512448462.pvm` to use with the Packer
+like `macOS_10.13.1.ovf` and/or `macOS_10.13.1.pvm` to use with the Packer
 template as the source type. For example:
 
 ```plain
 $ packer build  \
-> -var 'source_url=macOS_1512448228.ovf' \
+> -var 'source_url=./out/macOS_10.13.1.ovf' \
 > -only virtualbox-ovf template.json
 ```
 
 ```plain
 $ packer build  \
-> -var 'source_url=macOS_1512448462.pvm' \
+> -var 'source_url=./out/macOS_10.13.1.pvm' \
 > -only virtualbox-pvm template.json
 ```
 
