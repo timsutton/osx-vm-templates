@@ -4,56 +4,106 @@
       "boot_wait": "5s",
       "disk_size": 40960,
       "guest_os_type": "macosx",
-      "iso_checksum_type": "{{user `iso_checksum_type`}}",
       "iso_checksum": "{{user `iso_checksum`}}",
+      "iso_checksum_type": "{{user `iso_checksum_type`}}",
       "iso_url": "{{user `iso_url`}}",
+      "name": "macos-parallels-iso",
+      "parallels_tools_flavor": "mac",
+      "prlctl": [
+        [
+          "set",
+          "{{.Name}}",
+          "--memsize",
+          "2048"
+        ],
+        [
+          "set",
+          "{{.Name}}",
+          "--memquota",
+          "512:2048"
+        ],
+        [
+          "set",
+          "{{.Name}}",
+          "--cpus",
+          "2"
+        ],
+        [
+          "set",
+          "{{.Name}}",
+          "--distribution",
+          "macosx"
+        ],
+        [
+          "set",
+          "{{.Name}}",
+          "--3d-accelerate",
+          "highest"
+        ],
+        [
+          "set",
+          "{{.Name}}",
+          "--high-resolution",
+          "off"
+        ],
+        [
+          "set",
+          "{{.Name}}",
+          "--auto-share-camera",
+          "off"
+        ],
+        [
+          "set",
+          "{{.Name}}",
+          "--auto-share-bluetooth",
+          "off"
+        ],
+        [
+          "set",
+          "{{.Name}}",
+          "--on-window-close",
+          "keep-running"
+        ],
+        [
+          "set",
+          "{{.Name}}",
+          "--shf-host",
+          "off"
+        ]
+      ],
       "shutdown_command": "echo '{{user `username`}}' | sudo -S shutdown -h now",
+      "ssh_password": "{{user `password`}}",
       "ssh_port": 22,
       "ssh_username": "{{user `username`}}",
-      "ssh_password": "{{user `password`}}",
       "ssh_wait_timeout": "10000s",
-      "parallels_tools_flavor": "mac",
-      "type": "parallels-iso",
-      "name": "macos-parallels-iso",
-      "prlctl": [
-        ["set", "{{.Name}}", "--memsize", "2048"],
-        ["set", "{{.Name}}", "--memquota", "512:2048"],
-        ["set", "{{.Name}}", "--cpus", "2"],
-        ["set", "{{.Name}}", "--distribution", "macosx"],
-        ["set", "{{.Name}}", "--3d-accelerate", "highest"],
-        ["set", "{{.Name}}", "--high-resolution", "off"],
-        ["set", "{{.Name}}", "--auto-share-camera", "off"],
-        ["set", "{{.Name}}", "--auto-share-bluetooth", "off"],
-        ["set", "{{.Name}}", "--on-window-close", "keep-running"],
-        ["set", "{{.Name}}", "--shf-host", "off"]
-      ]
+      "type": "parallels-iso"
     },
     {
       "boot_wait": "2s",
       "disk_size": 40960,
       "guest_os_type": "darwin12-64",
-      "iso_checksum_type": "{{user `iso_checksum_type`}}",
       "iso_checksum": "{{user `iso_checksum`}}",
+      "iso_checksum_type": "{{user `iso_checksum_type`}}",
       "iso_url": "{{user `iso_url`}}",
+      "name": "macos-vmware-iso",
       "shutdown_command": "echo '{{user `username`}}' | sudo -S shutdown -h now",
       "skip_compaction": true,
+      "ssh_password": "{{user `password`}}",
       "ssh_port": 22,
       "ssh_username": "{{user `username`}}",
-      "ssh_password": "{{user `password`}}",
       "ssh_wait_timeout": "10000s",
       "tools_upload_flavor": "darwin",
       "type": "vmware-iso",
-      "name": "macos-vmware-iso",
       "vmx_data": {
         "cpuid.coresPerSocket": "1",
-        "memsize": "2048",
-        "numvcpus": "1",
+        "ehci.present": "TRUE",
         "firmware": "efi",
-        "keyboardAndMouseProfile": "macProfile",
-        "smc.present": "TRUE",
         "hpet0.present": "TRUE",
         "ich7m.present": "TRUE",
-        "ehci.present": "TRUE",
+        "keyboardAndMouseProfile": "macProfile",
+        "memsize": "2048",
+        "numvcpus": "1",
+        "smc.present": "TRUE",
         "usb.present": "TRUE"
       }
     },
@@ -63,91 +113,242 @@
       "guest_additions_mode": "disable",
       "guest_os_type": "MacOS1011_64",
       "hard_drive_interface": "sata",
-      "iso_checksum_type": "{{user `iso_checksum_type`}}",
       "iso_checksum": "{{user `iso_checksum`}}",
+      "iso_checksum_type": "{{user `iso_checksum_type`}}",
       "iso_interface": "sata",
       "iso_url": "{{user `iso_url`}}",
+      "name": "macos-virtualbox-iso",
       "shutdown_command": "echo '{{user `username`}}' | sudo -S shutdown -h now",
+      "ssh_password": "{{user `password`}}",
       "ssh_port": 22,
       "ssh_username": "{{user `username`}}",
-      "ssh_password": "{{user `password`}}",
       "ssh_wait_timeout": "10000s",
       "type": "virtualbox-iso",
-      "name": "macos-virtualbox-iso",
       "vboxmanage": [
-        ["modifyvm", "{{.Name}}", "--audiocontroller", "hda"],
-        ["modifyvm", "{{.Name}}", "--boot1", "dvd"],
-        ["modifyvm", "{{.Name}}", "--boot2", "disk"],
-        ["modifyvm", "{{.Name}}", "--chipset", "ich9"],
-        ["modifyvm", "{{.Name}}", "--firmware", "efi"],
-        ["modifyvm", "{{.Name}}", "--hpet", "on"],
-        ["modifyvm", "{{.Name}}", "--keyboard", "usb"],
-        ["modifyvm", "{{.Name}}", "--memory", "2048"],
-        ["modifyvm", "{{.Name}}", "--mouse", "usbtablet"],
-        ["modifyvm", "{{.Name}}", "--vram", "128"],
-        ["storagectl", "{{.Name}}", "--name", "IDE Controller", "--remove"]
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--audiocontroller",
+          "hda"
+        ],
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--boot1",
+          "dvd"
+        ],
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--boot2",
+          "disk"
+        ],
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--chipset",
+          "ich9"
+        ],
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--firmware",
+          "efi"
+        ],
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--hpet",
+          "on"
+        ],
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--keyboard",
+          "usb"
+        ],
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--memory",
+          "2048"
+        ],
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--mouse",
+          "usbtablet"
+        ],
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--vram",
+          "128"
+        ],
+        [
+          "storagectl",
+          "{{.Name}}",
+          "--name",
+          "IDE Controller",
+          "--remove"
+        ]
       ]
     },
     {
       "boot_wait": "2s",
       "guest_additions_mode": "disable",
-      "source_path": "{{user `source_path`}}",
+      "name": "macos-virtualbox-ovf",
       "shutdown_command": "echo '{{user `username`}}' | sudo -S shutdown -h now",
+      "source_path": "{{user `source_path`}}",
+      "ssh_password": "{{user `password`}}",
       "ssh_port": 22,
       "ssh_username": "{{user `username`}}",
-      "ssh_password": "{{user `password`}}",
       "ssh_wait_timeout": "10000s",
       "type": "virtualbox-ovf",
-      "name": "macos-virtualbox-ovf",
       "vboxmanage": [
-        ["modifyvm", "{{.Name}}", "--audiocontroller", "hda"],
-        ["modifyvm", "{{.Name}}", "--chipset", "ich9"],
-        ["modifyvm", "{{.Name}}", "--firmware", "efi"],
-        ["modifyvm", "{{.Name}}", "--hpet", "on"],
-        ["modifyvm", "{{.Name}}", "--keyboard", "usb"],
-        ["modifyvm", "{{.Name}}", "--memory", "4096"],
-        ["modifyvm", "{{.Name}}", "--mouse", "usbtablet"],
-        ["modifyvm", "{{.Name}}", "--vram", "128"]
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--audiocontroller",
+          "hda"
+        ],
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--chipset",
+          "ich9"
+        ],
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--firmware",
+          "efi"
+        ],
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--hpet",
+          "on"
+        ],
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--keyboard",
+          "usb"
+        ],
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--memory",
+          "4096"
+        ],
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--mouse",
+          "usbtablet"
+        ],
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--vram",
+          "128"
+        ]
       ]
     },
     {
       "boot_wait": "2s",
+      "name": "macos-parallels-pvm",
       "parallels_tools_flavor": "mac",
-      "source_path": "{{user `source_path`}}",
+      "prlctl": [
+        [
+          "set",
+          "{{.Name}}",
+          "--memsize",
+          "2048"
+        ],
+        [
+          "set",
+          "{{.Name}}",
+          "--memquota",
+          "512:2048"
+        ],
+        [
+          "set",
+          "{{.Name}}",
+          "--cpus",
+          "2"
+        ],
+        [
+          "set",
+          "{{.Name}}",
+          "--distribution",
+          "macosx"
+        ],
+        [
+          "set",
+          "{{.Name}}",
+          "--3d-accelerate",
+          "highest"
+        ],
+        [
+          "set",
+          "{{.Name}}",
+          "--high-resolution",
+          "off"
+        ],
+        [
+          "set",
+          "{{.Name}}",
+          "--auto-share-camera",
+          "off"
+        ],
+        [
+          "set",
+          "{{.Name}}",
+          "--auto-share-bluetooth",
+          "off"
+        ],
+        [
+          "set",
+          "{{.Name}}",
+          "--on-window-close",
+          "keep-running"
+        ],
+        [
+          "set",
+          "{{.Name}}",
+          "--shf-host",
+          "off"
+        ],
+        [
+          "set",
+          "{{.Name}}",
+          "--efi-boot",
+          "on"
+        ]
+      ],
       "shutdown_command": "echo '{{user `username`}}' | sudo -S shutdown -h now",
+      "source_path": "{{user `source_path`}}",
+      "ssh_password": "{{user `password`}}",
       "ssh_port": 22,
       "ssh_username": "{{user `username`}}",
-      "ssh_password": "{{user `password`}}",
       "ssh_wait_timeout": "10000s",
-      "type": "parallels-pvm",
-      "name": "macos-parallels-pvm",
-      "prlctl": [
-        ["set", "{{.Name}}", "--memsize", "2048"],
-        ["set", "{{.Name}}", "--memquota", "512:2048"],
-        ["set", "{{.Name}}", "--cpus", "2"],
-        ["set", "{{.Name}}", "--distribution", "macosx"],
-        ["set", "{{.Name}}", "--3d-accelerate", "highest"],
-        ["set", "{{.Name}}", "--high-resolution", "off"],
-        ["set", "{{.Name}}", "--auto-share-camera", "off"],
-        ["set", "{{.Name}}", "--auto-share-bluetooth", "off"],
-        ["set", "{{.Name}}", "--on-window-close", "keep-running"],
-        ["set", "{{.Name}}", "--shf-host", "off"],
-        ["set", "{{.Name}}", "--efi-boot", "on"]
-      ]
+      "type": "parallels-pvm"
     }
   ],
   "min_packer_version": "0.7.0",
   "post-processors": [
     {
       "compression_level": 9,
-      "type": "vagrant",
-      "output": "{{user `vagrant_box_directory`}}/{{.BuildName}}.box"
+      "output": "{{user `vagrant_box_directory`}}/{{.BuildName}}.box",
+      "type": "vagrant"
     }
   ],
   "provisioners": [
     {
-      "type": "shell-local",
-      "command": "sleep {{user `provisioning_delay`}}"
+      "command": "sleep {{user `provisioning_delay`}}",
+      "type": "shell-local"
     },
     {
       "destination": "/private/tmp/set_kcpassword.py",
@@ -155,19 +356,6 @@
       "type": "file"
     },
     {
-      "execute_command": "chmod +x {{ .Path }}; sudo {{ .Vars }} {{ .Path }}",
-      "scripts": [
-        "../scripts/vagrant.sh",
-        "../scripts/vmware.sh",
-        "../scripts/parallels.sh",
-        "../scripts/xcode-cli-tools.sh",
-        "../scripts/chef-omnibus.sh",
-        "../scripts/puppet.sh",
-        "../scripts/add-network-interface-detection.sh",
-        "../scripts/autologin.sh",
-        "../scripts/system-update.sh",
-        "../scripts/shrink.sh"
-      ],
       "environment_vars": [
         "AUTOLOGIN={{user `autologin`}}",
         "CHEF_VERSION={{user `chef_version`}}",
@@ -182,7 +370,38 @@
         "UPDATE_SYSTEM={{user `update_system`}}",
         "USERNAME={{user `username`}}"
       ],
+      "execute_command": "chmod +x {{ .Path }}; sudo {{ .Vars }} {{ .Path }}",
+      "scripts": [
+        "../scripts/vagrant.sh",
+        "../scripts/vmware.sh",
+        "../scripts/parallels.sh",
+        "../scripts/xcode-cli-tools.sh",
+        "../scripts/chef-omnibus.sh",
+        "../scripts/puppet.sh",
+        "../scripts/add-network-interface-detection.sh",
+        "../scripts/autologin.sh",
+        "../scripts/system-update.sh",
+        "../scripts/shrink.sh"
+      ],
       "type": "shell"
+    },
+    {
+      "execute_command": "sudo /usr/local/bin/chef-client --no-color --config {{.ConfigPath}} --json-attributes {{.JsonPath}}",
+      "json": {
+        "macos": {
+          "xcode": {
+            "version": "{{user `xcode_version`}}"
+          }
+        }
+      },
+      "knife_command": "sudo /usr/local/bin/knife {{.Args}} {{.Flags}}",
+      "run_list": [
+        "{{user `run_list`}}"
+      ],
+      "server_url": "{{user `server_url`}}",
+      "type": "chef-client",
+      "validation_client_name": "{{user `validation_client_name`}}",
+      "validation_key_path": "{{user `validation_key_path`}}"
     }
   ],
   "variables": {
@@ -192,15 +411,16 @@
     "hiera_version": "none",
     "install_vagrant_keys": "true",
     "install_xcode_cli_tools": "true",
-    "iso_url": "none",
-    "iso_checksum_type": "none",
     "iso_checksum": "none",
+    "iso_checksum_type": "none",
+    "iso_url": "none",
     "password": "vagrant",
     "provisioning_delay": "0",
-    "puppet_version": "none",
     "puppet_agent_version": "none",
+    "puppet_version": "none",
     "update_system": "true",
     "username": "vagrant",
     "vagrant_box_directory": "./out"
   }
 }
+
