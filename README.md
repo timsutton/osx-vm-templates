@@ -12,8 +12,9 @@ Build macOS [Vagrant](https://www.vagrantup.com/) boxes using [Packer](https://w
   - [ISO Builders](#iso-builders)
   - [VM Builders](#vm-builders)
 - [Provisioning Options](#provisioning-options)
-- [Add the Vagrant Box](#add-the-vagrant-box)
-- [Things to Watch Out  For](#things-to-watch-out-for)
+- [Tips and Troubleshooting](#tips-and-troubleshooting)
+  - [Packer Build Tips](#packer-build-tips)
+  - [How to Add the Vagrant Box](#how-to-add-the-vagrant-box)
 - [Acknowledgements](#acknowledgements)
 
 Getting Started
@@ -408,45 +409,29 @@ $ packer build \
 template.json
 ```
 
-Add the Vagrant Box
-----------------------
+Tips and Troubleshooting
+------------------------
 
-After the build finishes (regardless of your source type), you'll end up with a
-freshly provisioned macOS Vagrant box that you can add to your `VAGRANT_HOME` directory:
+### Packer Build Tips
 
-```plain
-vagrant box add packer_parallels_pvm.box --name macos-10.13.2
-```
-
-If you have a private Vagrant cloud set up using [vagrancy](https://github.com/ryandoyle/vagrancy),
-you could add your new box like so:
-
-```plain
-curl --upload-file packer_parallels_pvm.box http://server-foo:8099/username-bar/macos-10.13.1/1.0.0/parallels
-```
-
-Tips For Building the Vagrant Box
----------------------------------
-The following are some good things to know before you start your Packer build.
-
-### Inspect
+#### Inspect
 
 Run `packer inspect packer/template.json` to have a closer look at the
 template. This may help clear up some confusion before you execute your build.
 
-### Validate
+#### Validate
 
 It's also good practice to validate the template with the expected variables
 before executing your build:
 
 ```plain
 $ packer validate \
-> -var 'source_url=macOS_1512448228.ovf' \
+> -var 'source_url=./out/macOS_10.13.1.ovf' \
 > -only virtualbox-ovf template.json
 Template validated successfully.
 ```
 
-### Var Files
+#### Var Files
 
 It should also be known that Packer allows the use of dedicated JSON file for
 setting variable values for ease of reuse and use in source control.
@@ -466,14 +451,25 @@ $ cat packer/parallels-packer.json
 {
     "chef_version": "latest",
     "autologin": "true",
-    "source_path: "macOS_1512374121.pvm",
-    "vagrant_box_directory": "./output",
-    "output_directory": "./packer_cache"
+    "source_path: "./out/macOS_10.13.1.pvm",
 }
 ```
 
-Things to Watch Out For
------------------------
+### How to Add the Vagrant Box
+
+After the build finishes (regardless of your source type), you'll end up with a
+freshly provisioned macOS Vagrant box that you can add to your `VAGRANT_HOME` directory:
+
+```plain
+vagrant box add packer_parallels_pvm.box --name macos-10.13.2
+```
+
+If you have a private Vagrant cloud set up using [vagrancy](https://github.com/ryandoyle/vagrancy),
+you could add your new box like so:
+
+```plain
+curl --upload-file packer_parallels_pvm.box http://server-foo:8099/username-bar/macos-10.13.1/1.0.0/parallels
+```
 
 ### Local VM builds take up a lot of disk space
 
