@@ -7,7 +7,6 @@
       "iso_checksum": "{{user `iso_checksum`}}",
       "iso_checksum_type": "{{user `iso_checksum_type`}}",
       "iso_url": "{{user `iso_url`}}",
-      "name": "macos-parallels-iso",
       "parallels_tools_flavor": "mac",
       "prlctl": [
         [
@@ -85,7 +84,6 @@
       "iso_checksum": "{{user `iso_checksum`}}",
       "iso_checksum_type": "{{user `iso_checksum_type`}}",
       "iso_url": "{{user `iso_url`}}",
-      "name": "macos-vmware-iso",
       "shutdown_command": "echo '{{user `username`}}' | sudo -S shutdown -h now",
       "skip_compaction": true,
       "ssh_password": "{{user `password`}}",
@@ -117,7 +115,6 @@
       "iso_checksum_type": "{{user `iso_checksum_type`}}",
       "iso_interface": "sata",
       "iso_url": "{{user `iso_url`}}",
-      "name": "macos-virtualbox-iso",
       "shutdown_command": "echo '{{user `username`}}' | sudo -S shutdown -h now",
       "ssh_password": "{{user `password`}}",
       "ssh_port": 22,
@@ -197,7 +194,6 @@
     {
       "boot_wait": "2s",
       "guest_additions_mode": "disable",
-      "name": "macos-virtualbox-ovf",
       "shutdown_command": "echo '{{user `username`}}' | sudo -S shutdown -h now",
       "source_path": "{{user `source_path`}}",
       "ssh_password": "{{user `password`}}",
@@ -258,7 +254,6 @@
     },
     {
       "boot_wait": "2s",
-      "name": "macos-parallels-pvm",
       "parallels_tools_flavor": "mac",
       "prlctl": [
         [

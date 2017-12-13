@@ -64,6 +64,9 @@ prlctl set "$VM" --efi-boot "on" > /dev/null
 prlctl set "$VM" --cpus "2" > /dev/null
 prlctl set "$VM" --memsize "4096" > /dev/null
 
+msg_status "Installing Parallels tools"
+prlctl installtools "$VM"
+
 cleanup
 
 msg_status "Done. Virtual machine export located at $OUTPUT."
