@@ -369,7 +369,7 @@
       "scripts": [
         "../scripts/vagrant.sh",
         "../scripts/vmware.sh",
-        "../scripts/parallels.sh",
+        "../scripts/install-parallels-tools.sh",
         "../scripts/xcode-cli-tools.sh",
         "../scripts/chef-omnibus.sh",
         "../scripts/puppet.sh",

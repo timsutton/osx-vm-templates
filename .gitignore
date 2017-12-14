@@ -15,3 +15,5 @@ packer/output-*
 *.dump
 *.hdd
 *.vhd
+*.tar
+*.bz2
