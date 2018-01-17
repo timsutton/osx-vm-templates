@@ -63,6 +63,13 @@ msg_status "Setting up Parallels virtual machine"
 prlctl set "$VM" --efi-boot "on" > /dev/null
 prlctl set "$VM" --cpus "2" > /dev/null
 prlctl set "$VM" --memsize "4096" > /dev/null
+prlctl set "$VM" --memquota "512:2048" > /dev/null
+prlctl set "$VM" --3d-accelerate "highest" > /dev/null
+prlctl set "$VM" --high-resolution "off" > /dev/null
+prlctl set "$VM" --auto-share-camera "off" > /dev/null
+prlctl set "$VM" --auto-share-bluetooth "off" > /dev/null
+prlctl set "$VM" --on-window-close "keep-running" > /dev/null
+prlctl set "$VM" --shf-host "off" > /dev/null
 
 msg_status "Installing Parallels tools"
 prlctl installtools "$VM"

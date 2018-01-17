@@ -260,7 +260,7 @@
           "set",
           "{{.Name}}",
           "--memsize",
-          "2048"
+          "4096"
         ],
         [
           "set",
@@ -418,4 +418,3 @@
     "vagrant_box_directory": "./out"
   }
 }
-
