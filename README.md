@@ -198,7 +198,7 @@ either a VirtualBox or Parallels virtual machine.
 **Note**: Similar to `prepare_iso.sh`, this script must be run with `sudo`.
 
 ```plain
-sudo ../prepare_iso/prepare_vhd.sh "/Applications/Install High Sierra.app" out
+sudo ../prepare_iso/prepare_vhd.sh "/Applications/Install macOS High Sierra.app" out
 ```
 
 Where the first argument to the script is the installer bundle and the second is
