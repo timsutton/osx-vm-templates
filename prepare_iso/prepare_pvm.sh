@@ -59,9 +59,6 @@ msg_status "Converting VHD to Parallels format"
 prl_convert "$HARDDRIVE" --dst="$OUTPUT" --allow-no-os
 mv "$CONVERTED_HDD" "$PARALLELS_HDD"
 
-msg_status "Compacting $PARALLELS_HDD"
-prl_disk_tool compact --hdd "$PARALLELS_HDD"
-
 msg_status "Adding SATA Controller and attaching Parallels HDD"
 prlctl set "$VM" --device-add hdd --image "$PARALLELS_HDD" --iface sata --position 0
 
