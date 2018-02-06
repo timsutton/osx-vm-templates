@@ -74,9 +74,6 @@ prlctl set "$VM" --auto-share-bluetooth "off"
 prlctl set "$VM" --on-window-close "keep-running"
 prlctl set "$VM" --shf-host "off"
 
-msg_status "Installing Parallels tools"
-prlctl installtools "$VM"
-
 cleanup
 
 msg_status "Done. Virtual machine export located at $OUTPUT."
