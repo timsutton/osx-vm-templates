@@ -11,9 +11,9 @@ Creates and exports a Parallels virtual machine (PVM) from a virtual disk image
 EOF
 }
 
-green='\033[0;32m'
-red='\033[0;31m'
-none='\033[0m'
+GREEN='\033[0;32m'
+RED='\033[0;31m'
+NONE='\033[0m'
 
 cleanup() {
     if [ -n "$VM" ] && prlctl list --all | grep -q "$VM"; then
@@ -24,17 +24,41 @@ cleanup() {
 trap cleanup EXIT INT TERM
 
 msg_status() {
-    echo -e "$green-- $1"
-    echo -ne "$none"
+    echo -e "$GREEN-- $1"
+    echo -ne "$NONE"
 }
 
 msg_error() {
-    echo -e "$red-- $1"
-    echo -ne "$none"
+    echo -e "$RED-- $1"
+    echo -ne "$NONE"
 }
 
 render_template() {
     eval "echo \"$(cat "$1")\""
+}
+
+realpath_macos()
+{
+    # Source:
+    # https://stackoverflow.com/questions/1055671/how-can-i-get-the-behavior-of-gnus-readlink-f-on-a-mac
+
+    TARGET_FILE=$1
+
+    cd "$(dirname "$TARGET_FILE")" || exit 1
+    TARGET_FILE="$(basename "$TARGET_FILE")"
+
+    # Iterate down a (possible) chain of symlinks
+    while [ -L "$TARGET_FILE" ]; do
+        TARGET_FILE=$(readlink -f "$TARGET_FILE")
+        cd "$(dirname "$TARGET_FILE")" || exit 1
+        TARGET_FILE="$(basename "$TARGET_FILE")"
+    done
+
+    # Compute the canonicalized name by finding the physical path
+    # for the directory we're in and appending the target file.
+    PHYS_DIR="$(pwd -P)"
+    RESULT=$PHYS_DIR/$TARGET_FILE
+    echo "$RESULT"
 }
 
 if [ ! -f "$1" ]; then
@@ -46,7 +70,7 @@ HARDDRIVE="$1"
 VM="$(basename "${HARDDRIVE%.vhd}")"
 
 OUTPUT="${HARDDRIVE%.vhd}.pvm"
-ABS_PATH="$(realpath "$OUTPUT")"
+ABS_PATH="$(realpath_macos "$OUTPUT")"
 
 ABS_PARENT="$(dirname "$ABS_PATH")"
 CONVERTED_HDD="${ABS_PATH}/${VM}.hdd"
