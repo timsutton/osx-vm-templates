@@ -1,9 +1,9 @@
 #!/bin/sh -e
 #
 # Preparation script for an OS X automated installation for use with VeeWee/Packer/Vagrant
-# 
+#
 # What the script does, in more detail:
-# 
+#
 # 1. Mounts the InstallESD.dmg using a shadow file, so the original DMG is left
 #    unchanged.
 # 2. Modifies the BaseSystem.dmg within in order to add an additional 'rc.cdrom.local'
@@ -29,13 +29,14 @@
 # https://github.com/timsutton/osx-vm-templates/issues/40
 
 usage() {
-	cat <<EOF
+  cat <<EOF
 Usage:
 $(basename "$0") [-upiD] "/path/to/InstallESD.dmg" /path/to/output/directory
 $(basename "$0") [-upiD] "/path/to/Install OS X [Name].app" /path/to/output/directory
+$(basename "$0") [-upiD] "/path/to/Install macOS [Name].app" /path/to/output/directory
 
 Description:
-Converts an OS X installer to a new image that contains components
+Converts an OS X/macOS installer to a new image that contains components
 used to perform an automated installation. The new image will be named
 'OSX_InstallESD_[osversion].dmg.'
 
@@ -59,24 +60,24 @@ EOF
 }
 
 cleanup() {
-    hdiutil detach -quiet -force "$MNT_ESD" || echo > /dev/null
-    hdiutil detach -quiet -force "$MNT_BASE_SYSTEM" || echo > /dev/null
-    rm -rf "$MNT_ESD" "$MNT_BASE_SYSTEM" "$BASE_SYSTEM_DMG_RW" "$SHADOW_FILE"
+  hdiutil detach -quiet -force "$MNT_ESD" || echo > /dev/null
+  hdiutil detach -quiet -force "$MNT_BASE_SYSTEM" || echo > /dev/null
+  rm -rf "$MNT_ESD" "$MNT_BASE_SYSTEM" "$BASE_SYSTEM_DMG_RW" "$SHADOW_FILE"
 }
 
 trap cleanup EXIT INT TERM
 
 
 msg_status() {
-	echo "\033[0;32m-- $1\033[0m"
+  echo "\\033[0;32m-- $1\\033[0m"
 }
 msg_error() {
-	echo "\033[0;31m-- $1\033[0m"
+  echo "\\033[0;31m-- $1\\033[0m"
 }
 
 if [ $# -eq 0 ]; then
-	usage
-	exit 1
+  usage
+  exit 1
 fi
 
 SCRIPT_DIR="$(cd "$(dirname "$0")"; pwd)"
@@ -108,9 +109,9 @@ while getopts u:p:i:D: OPT; do
       IMAGE_PATH="$OPTARG"
       ;;
     D)
-      if [ x${!OPTARG} = x0 ]; then
-        eval $OPTARG=1
-      elif [ x${!OPTARG} != x1 ]; then
+      if [ x"${!OPTARG}" = x0 ]; then
+        eval "$OPTARG"=1
+      elif [ x"${!OPTARG}" != x1 ]; then
         msg_error "Unknown flag: ${OPTARG}"
         usage
         exit 1
@@ -124,26 +125,29 @@ while getopts u:p:i:D: OPT; do
 done
 
 # Remove the switches we parsed above.
-shift $(expr $OPTIND - 1)
+shift "$((OPTIND - 1))"
 
-if [ $(id -u) -ne 0 ]; then
-	msg_error "This script must be run as root, as it saves a disk image with ownerships enabled."
-	exit 1
+if [ "$(id -u)" -ne 0 ]; then
+  msg_error "This script must be run as root, as it saves a disk image with ownerships enabled."
+  exit 1
 fi
 
-ESD="$1"
-if [ ! -e "$ESD" ]; then
-	msg_error "Input installer image $ESD could not be found! Exiting.."
-	exit 1
+SOURCE="$1"
+if [ ! -e "$SOURCE" ]; then
+  msg_error "Input installer image $SOURCE could not be found! Exiting.."
+  exit 1
 fi
 
-if [ -d "$ESD" ]; then
-	# we might be an install .app
-	if [ -e "$ESD/Contents/SharedSupport/InstallESD.dmg" ]; then
-		ESD="$ESD/Contents/SharedSupport/InstallESD.dmg"
-	else
-		msg_error "Can't locate an InstallESD.dmg in this source location $ESD!"
-	fi
+if [ -d "$SOURCE" ]; then
+  # we might be an install .app
+  if [ -e "$SOURCE/Contents/SharedSupport/InstallESD.dmg" ]; then
+    SHARED_SUPPORT="$SOURCE/Contents/SharedSupport"
+    ESD="$SHARED_SUPPORT/InstallESD.dmg"
+  else
+    msg_error "Can't locate an InstallESD.dmg in this source location $SOURCE!"
+  fi
+else
+  ESD="$SOURCE"
 fi
 
 VEEWEE_DIR="$(cd "$SCRIPT_DIR/../../../"; pwd)"
@@ -152,67 +156,75 @@ VEEWEE_GID=$(/usr/bin/stat -f %g "$VEEWEE_DIR")
 DEFINITION_DIR="$(cd "$SCRIPT_DIR/.."; pwd)"
 
 if [ "$2" = "" ]; then
-    msg_error "Currently an explicit output directory is required as the second argument."
-	exit 1
-	# The rest is left over from the old prepare_veewee_iso.sh script. Not sure if we
-    # should leave in this functionality to automatically locate the veewee directory.
-	DEFAULT_ISO_DIR=1
-	OLDPWD=$(pwd)
-	cd "$SCRIPT_DIR"
-	# default to the veewee/iso directory
-	if [ ! -d "../../../iso" ]; then
-		mkdir "../../../iso"
-		chown $VEEWEE_UID:$VEEWEE_GID "../../../iso"
-	fi
-	OUT_DIR="$(cd "$SCRIPT_DIR"; cd ../../../iso; pwd)"
-	cd "$OLDPWD" # Rest of script depends on being in the working directory if we were passed relative paths
+  msg_error "Currently an explicit output directory is required as the second argument."
+  exit 1
+  # The rest is left over from the old prepare_veewee_iso.sh script. Not sure if we
+  # should leave in this functionality to automatically locate the veewee directory.
+  DEFAULT_ISO_DIR=1
+  OLDPWD=$(pwd)
+  cd "$SCRIPT_DIR"
+  # default to the veewee/iso directory
+  if [ ! -d "../../../iso" ]; then
+    mkdir "../../../iso"
+    chown "$VEEWEE_UID":"$VEEWEE_GID" "../../../iso"
+  fi
+  OUT_DIR="$(cd "$SCRIPT_DIR"; cd ../../../iso; pwd)"
+  cd "$OLDPWD" # Rest of script depends on being in the working directory if we were passed relative paths
 else
-	OUT_DIR="$2"
+  OUT_DIR="$2"
 fi
 
 if [ ! -d "$OUT_DIR" ]; then
-	msg_status "Destination dir $OUT_DIR doesn't exist, creating.."
-	mkdir -p "$OUT_DIR"
+  msg_status "Destination dir $OUT_DIR doesn't exist, creating.."
+  mkdir -p "$OUT_DIR"
 fi
 
 if [ -e "$ESD.shadow" ]; then
-	msg_status "Removing old shadow file.."
-	rm "$ESD.shadow"
+  msg_status "Removing old shadow file.."
+  rm "$ESD.shadow"
 fi
 
 MNT_ESD=$(/usr/bin/mktemp -d /tmp/veewee-osx-esd.XXXX)
 SHADOW_FILE=$(/usr/bin/mktemp /tmp/veewee-osx-shadow.XXXX)
 rm "$SHADOW_FILE"
 msg_status "Attaching input OS X installer image with shadow file.."
-hdiutil attach "$ESD" -mountpoint "$MNT_ESD" -shadow "$SHADOW_FILE" -nobrowse -owners on 
-if [ $? -ne 0 ]; then
-	[ ! -e "$ESD" ] && msg_error "Could not find $ESD in $(pwd)"
-	msg_error "Could not mount $ESD on $MNT_ESD"
-	exit 1
+
+if ! hdiutil attach "$ESD" -mountpoint "$MNT_ESD" -shadow "$SHADOW_FILE" -nobrowse -owners on; then
+  [ ! -e "$ESD" ] && msg_error "Could not find $ESD in $(pwd)"
+  msg_error "Could not mount $ESD on $MNT_ESD"
+  exit 1
 fi
 
 msg_status "Mounting BaseSystem.."
-BASE_SYSTEM_DMG="$MNT_ESD/BaseSystem.dmg"
+if [ -e "$SHARED_SUPPORT/BaseSystem.dmg" ]; then
+  BASE_SYSTEM_DMG="$SHARED_SUPPORT/BaseSystem.dmg"
+  CHUNKLIST="$SHARED_SUPPORT/BaseSystem.chunklist"
+elif [ -e "$MNT_ESD/BaseSystem.dmg" ]; then
+  BASE_SYSTEM_DMG="$MNT_ESD/BaseSystem.dmg"
+  CHUNKLIST="$MNT_ESD/BaseSystem.chunklist"
+else
+  msg_error "Could not find BaseSystem.dmg in $SOURCE"
+fi
+
 MNT_BASE_SYSTEM=$(/usr/bin/mktemp -d /tmp/veewee-osx-basesystem.XXXX)
-[ ! -e "$BASE_SYSTEM_DMG" ] && msg_error "Could not find BaseSystem.dmg in $MNT_ESD"
-hdiutil attach "$BASE_SYSTEM_DMG" -mountpoint "$MNT_BASE_SYSTEM" -nobrowse -owners on
-if [ $? -ne 0 ]; then
-	msg_error "Could not mount $BASE_SYSTEM_DMG on $MNT_BASE_SYSTEM"
-	exit 1
+
+if ! hdiutil attach "$BASE_SYSTEM_DMG" -mountpoint "$MNT_BASE_SYSTEM" -nobrowse -owners on; then
+  msg_error "Could not mount $BASE_SYSTEM_DMG on $MNT_BASE_SYSTEM"
+  exit 1
 fi
 SYSVER_PLIST_PATH="$MNT_BASE_SYSTEM/System/Library/CoreServices/SystemVersion.plist"
 
 DMG_OS_VERS=$(/usr/libexec/PlistBuddy -c 'Print :ProductVersion' "$SYSVER_PLIST_PATH")
-DMG_OS_VERS_MAJOR=$(echo $DMG_OS_VERS | awk -F "." '{print $2}')
-DMG_OS_VERS_MINOR=$(echo $DMG_OS_VERS | awk -F "." '{print $3}')
+DMG_OS_VERS_MAJOR=$(echo "$DMG_OS_VERS" | awk -F "." '{print $2}')
+DMG_OS_VERS_MINOR=$(echo "$DMG_OS_VERS" | awk -F "." '{print $3}')
 DMG_OS_BUILD=$(/usr/libexec/PlistBuddy -c 'Print :ProductBuildVersion' "$SYSVER_PLIST_PATH")
 msg_status "OS X version detected: 10.$DMG_OS_VERS_MAJOR.$DMG_OS_VERS_MINOR, build $DMG_OS_BUILD"
 
 OUTPUT_DMG="$OUT_DIR/OSX_InstallESD_${DMG_OS_VERS}_${DMG_OS_BUILD}.dmg"
 if [ -e "$OUTPUT_DMG" ]; then
-	msg_error "Output file $OUTPUT_DMG already exists! We're not going to overwrite it, exiting.."
-	hdiutil detach -force "$MNT_ESD"
-	exit 1
+  msg_error "Output file $OUTPUT_DMG already exists! We're not going to overwrite it, exiting.."
+  hdiutil detach -force "$MNT_ESD"
+  exit 1
 fi
 
 # Build our post-installation pkg that will create a user and enable ssh
@@ -242,31 +254,31 @@ msg_status "Restoring ('asr restore') the BaseSystem to the read-write DMG.."
 asr restore --source "$BASE_SYSTEM_DMG" --target "$MNT_BASE_SYSTEM" --noprompt --noverify --erase
 rm -r "$MNT_BASE_SYSTEM"
 
-if [ $DMG_OS_VERS_MAJOR -ge 9 ]; then
-    MNT_BASE_SYSTEM="/Volumes/OS X Base System"
-    BASESYSTEM_OUTPUT_IMAGE="$OUTPUT_DMG"
-    PACKAGES_DIR="$MNT_BASE_SYSTEM/System/Installation/Packages"
+if [ "$DMG_OS_VERS_MAJOR" -ge 9 ]; then
+  MNT_BASE_SYSTEM="/Volumes/OS X Base System"
+  BASESYSTEM_OUTPUT_IMAGE="$OUTPUT_DMG"
+  PACKAGES_DIR="$MNT_BASE_SYSTEM/System/Installation/Packages"
 
-    rm "$PACKAGES_DIR"
-	msg_status "Moving 'Packages' directory from the ESD to BaseSystem.."
-	mv -v "$MNT_ESD/Packages" "$MNT_BASE_SYSTEM/System/Installation/"
+  rm "$PACKAGES_DIR"
+  msg_status "Moving 'Packages' directory from the ESD to BaseSystem.."
+  mv -v "$MNT_ESD/Packages" "$MNT_BASE_SYSTEM/System/Installation/"
 
-	# This isn't strictly required for Mavericks, but Yosemite will consider the
-	# installer corrupt if this isn't included, because it cannot verify BaseSystem's
-	# consistency and perform a recovery partition verification
-	msg_status "Copying in original BaseSystem dmg and chunklist.."
-	cp "$MNT_ESD/BaseSystem.dmg" "$MNT_BASE_SYSTEM/"
-	cp "$MNT_ESD/BaseSystem.chunklist" "$MNT_BASE_SYSTEM/"
+  # This isn't strictly required for Mavericks, but Yosemite will consider the
+  # installer corrupt if this isn't included, because it cannot verify BaseSystem's
+  # consistency and perform a recovery partition verification
+  msg_status "Copying in original BaseSystem dmg and chunklist.."
+  cp "$BASE_SYSTEM_DMG" "$MNT_BASE_SYSTEM/"
+  cp "$CHUNKLIST" "$MNT_BASE_SYSTEM/"
 else
-    MNT_BASE_SYSTEM="/Volumes/Mac OS X Base System"
-    BASESYSTEM_OUTPUT_IMAGE="$MNT_ESD/BaseSystem.dmg"
-    rm "$BASESYSTEM_OUTPUT_IMAGE"
-	PACKAGES_DIR="$MNT_ESD/Packages"
+  MNT_BASE_SYSTEM="/Volumes/Mac OS X Base System"
+  BASESYSTEM_OUTPUT_IMAGE="$BASE_SYSTEM_DMG"
+  rm "$BASESYSTEM_OUTPUT_IMAGE"
+  PACKAGES_DIR="$MNT_ESD/Packages"
 fi
 
 msg_status "Adding automated components.."
 CDROM_LOCAL="$MNT_BASE_SYSTEM/private/etc/rc.cdrom.local"
-cat > $CDROM_LOCAL << EOF
+cat > "$CDROM_LOCAL" << EOF
 diskutil eraseDisk jhfs+ "Macintosh HD" GPTFormat disk0
 if [ "\$?" == "1" ]; then
     diskutil eraseDisk jhfs+ "Macintosh HD" GPTFormat disk1
@@ -282,35 +294,34 @@ rm -rf "$SUPPORT_DIR/tmp"
 msg_status "Unmounting BaseSystem.."
 hdiutil detach "$MNT_BASE_SYSTEM"
 
-if [ $DMG_OS_VERS_MAJOR -lt 9 ]; then
-	msg_status "Pre-Mavericks we save back the modified BaseSystem to the root of the ESD."
-	hdiutil convert -format UDZO -o "$MNT_ESD/BaseSystem.dmg" "$BASE_SYSTEM_DMG_RW"
+if [ "$DMG_OS_VERS_MAJOR" -lt 9 ]; then
+  msg_status "Pre-Mavericks we save back the modified BaseSystem to the root of the ESD."
+  hdiutil convert -format UDZO -o "$BASE_SYSTEM_DMG" "$BASE_SYSTEM_DMG_RW"
 fi
 
 msg_status "Unmounting ESD.."
 hdiutil detach "$MNT_ESD"
 
-if [ $DMG_OS_VERS_MAJOR -ge 9 ]; then
-	msg_status "On Mavericks and later, the entire modified BaseSystem is our output dmg."
-	hdiutil convert -format UDZO -o "$OUTPUT_DMG" "$BASE_SYSTEM_DMG_RW"
+if [ "$DMG_OS_VERS_MAJOR" -ge 9 ]; then
+  msg_status "On Mavericks and later, the entire modified BaseSystem is our output dmg."
+  hdiutil convert -format UDZO -o "$OUTPUT_DMG" "$BASE_SYSTEM_DMG_RW"
 else
-	msg_status "Pre-Mavericks we're modifying the original ESD file."
-	hdiutil convert -format UDZO -o "$OUTPUT_DMG" -shadow "$SHADOW_FILE" "$ESD"
+  msg_status "Pre-Mavericks we're modifying the original ESD file."
+  hdiutil convert -format UDZO -o "$OUTPUT_DMG" -shadow "$SHADOW_FILE" "$ESD"
 fi
 rm -rf "$MNT_ESD" "$SHADOW_FILE"
 
 if [ -n "$SUDO_UID" ] && [ -n "$SUDO_GID" ]; then
-	msg_status "Fixing permissions.."
-	chown -R $SUDO_UID:$SUDO_GID \
-		"$OUT_DIR"
+  msg_status "Fixing permissions.."
+  chown -R "$SUDO_UID":"$SUDO_GID" "$OUT_DIR"
 fi
 
 if [ -n "$DEFAULT_ISO_DIR" ]; then
-	DEFINITION_FILE="$DEFINITION_DIR/definition.rb"
-	msg_status "Setting ISO file in definition $DEFINITION_FILE.."
-	ISO_FILE=$(basename "$OUTPUT_DMG")
-	# Explicitly use -e in order to use double quotes around sed command
-	sed -i -e "s/%OSX_ISO%/${ISO_FILE}/" "$DEFINITION_FILE"
+  DEFINITION_FILE="$DEFINITION_DIR/definition.rb"
+  msg_status "Setting ISO file in definition $DEFINITION_FILE.."
+  ISO_FILE=$(basename "$OUTPUT_DMG")
+  # Explicitly use -e in order to use double quotes around sed command
+  sed -i -e "s/%OSX_ISO%/${ISO_FILE}/" "$DEFINITION_FILE"
 fi
 
 msg_status "Checksumming output image.."
