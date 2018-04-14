@@ -33,6 +33,9 @@ Creates and install OS X into a virtual disk image. The virtual disk image will 
 named 'macOS_[osversion].vhd.'
 
 Optional switches:
+  -s <size in GB>
+    Sets the disk size in GB, defaults to 32.
+
   -u <user>
     Sets the username of the root user, defaults to 'vagrant'.
 
@@ -105,8 +108,11 @@ if [ $# -eq 0 ]; then
 	exit 1
 fi
 
-while getopts u:p:i:o:D: OPT; do
+while getopts s:u:p:i:o:D: OPT; do
   case "$OPT" in
+    s)
+      DISK_SIZE_GB="$OPTARG"
+      ;;
     u)
       USER="$OPTARG"
       ;;
