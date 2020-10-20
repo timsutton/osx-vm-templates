@@ -13,7 +13,7 @@
 #
 # Thanks:
 # Idea thanks to Per Olofsson's AutoDMG
-# (https://github.com/MagerValp/AutoDMG/wiki/How-Does-AutoDMG-Work%3F)
+# (https://github.com/MagerValp/AutoDMG/wiki/How-Does-AutoDMG-Work)
 #
 # And Joseph Chilcote's vfuse
 # (https://github.com/chilcote/vfuse)
